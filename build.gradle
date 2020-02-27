@@ -1,0 +1,35 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+ext {
+    javaMainClass = 'org.olabs.portal.api.Main'
+}
+
+application {
+    mainClassName = javaMainClass
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.apache.tomcat.embed:tomcat-embed-core:8.5.32'
+    compile 'org.apache.tomcat.embed:tomcat-embed-jasper:8.5.32'
+    compile 'org.apache.tomcat:tomcat-jasper:8.5.32'
+    compile 'org.mongodb:mongo-java-driver:3.12.1'
+    compile 'org.slf4j:slf4j-api:1.7.30'
+    compile 'ch.qos.logback:logback-classic:1.2.3'
+    compile 'org.slf4j:log4j-over-slf4j:1.7.30'
+    compile 'org.slf4j:jcl-over-slf4j:1.7.30'
+    compile 'org.slf4j:jul-to-slf4j:1.7.30'
+    compile 'org.apache.httpcomponents:httpclient:4.5.11'
+    compile 'commons-io:commons-io:2.1'
+    compile 'org.json:json:20190722'
+}

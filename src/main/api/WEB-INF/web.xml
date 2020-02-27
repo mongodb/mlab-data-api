@@ -1,0 +1,31 @@
+<!-- metadata-complete="true" disables expensive scanning for the @WebServlet annotation
+       http://wiki.apache.org/tomcat/HowTo/FasterStartUp -->
+<web-app version="3.0"
+         metadata-complete="true"
+         xmlns="http://java.sun.com/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+    <filter>
+        <filter-name>ApiKeyFilter</filter-name>
+        <filter-class>org.olabs.portal.api.ApiKeyFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>ApiKeyFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <servlet>
+        <servlet-name>Api</servlet-name>
+        <servlet-class>org.olabs.portal.api.ApiServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Api</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>Api</servlet-name>
+        <url-pattern>/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>
