@@ -1,2 +1,7 @@
-# mlab-data-api
-mLab Data API
+# mLab Data API
+
+## Usage
+
+```
+./gradlew run
+```
