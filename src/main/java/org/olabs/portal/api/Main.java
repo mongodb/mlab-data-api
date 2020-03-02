@@ -1,10 +1,6 @@
 package org.olabs.portal.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
@@ -70,13 +66,7 @@ public class Main {
       System.exit(0);
     }
 
-    if (startCmd.getArgs().length < 1) {
-      System.out.println("Config file required");
-      printStartHelp();
-      System.exit(1);
-    }
-
-    final ApiConfig config = parseConfig(startCmd.getArgs()[0]);
+    final ApiConfig config = ApiConfig.getInstance();
 
     final Tomcat tomcat = new Tomcat();
     tomcat.setPort(config.getPort());
@@ -109,16 +99,7 @@ public class Main {
   }
 
   private static void printStartHelp() {
-    new HelpFormatter().printHelp("mlab-data-api start [OPTIONS] <CONFIG>", getStartOptions());
-  }
-
-  private static ApiConfig parseConfig(String pFile) throws IOException {
-    final File file = new File(pFile);
-    if(!file.exists() || !file.isFile()) {
-      throw new FileNotFoundException();
-    }
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    return mapper.readValue(file, ApiConfig.class);
+    new HelpFormatter().printHelp("mlab-data-api start [OPTIONS]", getStartOptions());
   }
 
   public enum Command {
