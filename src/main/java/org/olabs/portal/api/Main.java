@@ -1,6 +1,10 @@
 package org.olabs.portal.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.Base64;
@@ -9,6 +13,11 @@ import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.webresources.DirResourceSet;
 import org.apache.catalina.webresources.StandardRoot;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.CommandLineParser;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Options;
 
 public class Main {
   private static final String WEB_APP_DIR = "src/main/api";
@@ -23,21 +32,54 @@ public class Main {
   }
 
   public static void main(String[] args) throws Exception {
-    if (args != null && args.length > 0) {
-      switch (Command.named(args[0])) {
-        case API_KEY:
-          System.out.println(generateApiKey(API_KEY_LENGTH));
-          System.exit(0);
-        case START:
-          System.out.println("Starting mLab Data API...");
-        default:
-          System.out.println("Invalid command");
-          System.exit(1);
-      }
+
+    final CommandLineParser parser = new DefaultParser();
+    final CommandLine mainCmd = parser.parse(getMainOptions(), args);
+
+    if (mainCmd.hasOption("h") || mainCmd.getArgs().length < 1) {
+      printMainHelp();
+      System.exit(0);
     }
 
+    final Command cmd = Command.named(mainCmd.getArgs()[0]);
+    if(cmd == null) {
+      System.out.println("Command not found: "+mainCmd.getArgs()[0]);
+      printMainHelp();
+      System.exit(1);
+    }
+    switch (cmd) {
+      case API_KEY:
+        System.out.println(generateApiKey(API_KEY_LENGTH));
+        System.exit(0);
+      case START:
+        System.out.println("Starting mLab Data API...");
+        break;
+      default:
+        System.out.println("Invalid command");
+        System.exit(1);
+    }
+
+    final String[] startOptions =
+        mainCmd.getArgs().length > 1
+            ? Arrays.copyOfRange(mainCmd.getArgs(), 1, mainCmd.getArgs().length)
+            : new String[] {};
+    final CommandLine startCmd = parser.parse(getStartOptions(), startOptions);
+
+    if (startCmd.hasOption("h")) {
+      printStartHelp();
+      System.exit(0);
+    }
+
+    if (startCmd.getArgs().length < 1) {
+      System.out.println("Config file required");
+      printStartHelp();
+      System.exit(1);
+    }
+
+    final ApiConfig config = parseConfig(startCmd.getArgs()[0]);
+
     final Tomcat tomcat = new Tomcat();
-    tomcat.setPort(9090);
+    tomcat.setPort(config.getPort());
     final StandardContext ctx =
         (StandardContext) tomcat.addWebapp("", new File(WEB_APP_DIR).getAbsolutePath());
     final File additionWebInfClasses = new File("target/classes");
@@ -48,6 +90,35 @@ public class Main {
     ctx.setResources(resources);
     tomcat.start();
     tomcat.getServer().await();
+  }
+
+  private static Options getMainOptions() {
+    final Options result = new Options();
+    result.addOption("h", "help", false, "print this message");
+    return (result);
+  }
+
+  private static void printMainHelp() {
+    new HelpFormatter().printHelp("mlab-data-api [OPTIONS] [api-key | start]", getMainOptions());
+  }
+
+  private static Options getStartOptions() {
+    final Options result = new Options();
+    result.addOption("h", "help", false, "print this message");
+    return (result);
+  }
+
+  private static void printStartHelp() {
+    new HelpFormatter().printHelp("mlab-data-api start [OPTIONS] <CONFIG>", getStartOptions());
+  }
+
+  private static ApiConfig parseConfig(String pFile) throws IOException {
+    final File file = new File(pFile);
+    if(!file.exists() || !file.isFile()) {
+      throw new FileNotFoundException();
+    }
+    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    return mapper.readValue(file, ApiConfig.class);
   }
 
   public enum Command {
