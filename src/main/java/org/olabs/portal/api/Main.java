@@ -14,6 +14,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
+import org.objectlabs.ws.ResourceException;
 
 public class Main {
   private static final String WEB_APP_DIR = "src/main/api";
@@ -66,10 +67,13 @@ public class Main {
       System.exit(0);
     }
 
-    final ApiConfig config = ApiConfig.getInstance();
-
     final Tomcat tomcat = new Tomcat();
-    tomcat.setPort(config.getPort());
+    try {
+      tomcat.setPort(ApiConfig.getInstance().getPort());
+    } catch(final ResourceException e) {
+      System.out.println(String.format("Error getting config: %s", e.getMessage()));
+      System.exit(1);
+    }
     final StandardContext ctx =
         (StandardContext) tomcat.addWebapp("", new File(WEB_APP_DIR).getAbsolutePath());
     final File additionWebInfClasses = new File("target/classes");

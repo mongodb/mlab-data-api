@@ -29,7 +29,7 @@ public class RootResource extends HttpRequestResource {
   }
 
   private static Resource makeClustersResource(Resource parent) {
-    Resource result = new AccountClustersResource();
+    Resource result = new ClustersResource();
     result.setName("clusters");
     result.setParent(parent);
     return result;

@@ -1,7 +1,5 @@
 package org.olabs.portal.api;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import org.objectlabs.http.HttpMethod;
 import org.objectlabs.ns.Uri;
@@ -9,7 +7,7 @@ import org.objectlabs.ws.RequestContext;
 import org.objectlabs.ws.Resource;
 import org.objectlabs.ws.ResourceException;
 
-public class AccountClustersResource extends PortalRESTResource {
+public class ClustersResource extends PortalRESTResource {
 
   private String[] methods = {HttpMethod.GET.name()};
 
@@ -19,9 +17,7 @@ public class AccountClustersResource extends PortalRESTResource {
 
   @Override
   public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
-    final List<String> result = new ArrayList<>();
-    result.add("test");
-    return (result);
+    return ApiConfig.getInstance().getClusters().keySet();
   }
 
   public Resource resolveRelative(Uri uri) {
