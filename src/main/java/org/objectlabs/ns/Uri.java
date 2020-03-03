@@ -3,25 +3,12 @@ package org.objectlabs.ns;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-/******************************************************************************
- * Uri
- *
- * @author William Shulman
- *
- * 02.07.2010
- */
 public class Uri {
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri() {
         super();
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri(URI uri) {
         this(uri.getScheme(),
              uri.getAuthority(),
@@ -30,9 +17,6 @@ public class Uri {
              uri.getQuery());
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri(String uri) {
         try {
             URI u = new URI(uri);
@@ -46,23 +30,14 @@ public class Uri {
         }
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri(String scheme, String path) {
         this(scheme, null, path);
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri(String scheme, String authority, String path) {
         this(scheme, authority, null, path, null);
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri(String scheme,
                String authority,
                String ssp,
@@ -87,9 +62,6 @@ public class Uri {
                   query);
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Uri(String scheme, Authority authority, Path path, String query) {
         configure(scheme, authority, path, query);
     }
@@ -105,9 +77,6 @@ public class Uri {
         setQuery(query);
     }
 
-    /*******************************************************************
-     * scheme
-     */
     private String scheme;
 
     public String getScheme() {
@@ -118,9 +87,6 @@ public class Uri {
         scheme = value;
     }
 
-    /*******************************************************************
-     * authority
-     */
     private Authority authority;
 
     public Authority getAuthority() {
@@ -131,9 +97,6 @@ public class Uri {
         authority = value;
     }
 
-    /*******************************************************************
-     * path
-     */
     private Path path;
 
     public Path getPath() {
@@ -145,9 +108,6 @@ public class Uri {
         path = value;
     }
 
-    /*******************************************************************
-     * query
-     */
     private String query;
 
     public String getQuery() {
@@ -158,9 +118,6 @@ public class Uri {
         query = value;
     }
 
-    /*******************************************************************
-     * name
-     */
     public String getName() {
         Path path = getPath();
         if (path.isEmpty()) {
@@ -169,9 +126,6 @@ public class Uri {
         return(path.getHead());
     }
 
-    /*******************************************************************
-     * absoluteName
-     */
     public String getAbsoluteName() { // XXX should have query?
         StringBuffer buff = new StringBuffer();
 
@@ -183,56 +137,35 @@ public class Uri {
         return(buff.toString());
     }
 
-    /*******************************************************************
-     * absolute
-     */
     public boolean isAbsolute() {
         return(getPath().isAbsolute());
     }
 
-    /*******************************************************************
-     * head
-     */
     public String getHead() {
         return(getPath().getHead());
     }
 
-    /*******************************************************************
-     * tail
-     */
     public Uri getTail() {
         Uri result = clone();
         result.setPath(getPath().getTail());
         return(result);
     }
 
-    /*******************************************************************
-     * parent
-     */
     public Uri getParent() {
         Uri result = clone();
         result.setPath(getPath().getParent());
         return(result);
     }
 
-    /*******************************************************************
-     * resolve
-     */
     public Uri resolve(String name) {
         throw(new IllegalArgumentException("not implemented"));
         // XXX do we want? might be useful
     }
 
-    /*******************************************************************
-     * hasEmptyPath
-     */
     public boolean hasEmptyPath() {
         return(getPath().isEmpty());
     }
 
-    /*******************************************************************
-     * clone
-     */
     public Uri clone() {
         Uri result = new Uri();
         result.setScheme(getScheme());
@@ -242,9 +175,6 @@ public class Uri {
         return(result);
     }
 
-    /*******************************************************************
-     * toURI
-     */
     public URI toURI() {
         try {
             return(new URI(toString()));
@@ -253,9 +183,6 @@ public class Uri {
         }
     }
 
-    /*******************************************************************
-     * toString
-     */
     public String toString() {
         return(getAbsoluteName());
     }

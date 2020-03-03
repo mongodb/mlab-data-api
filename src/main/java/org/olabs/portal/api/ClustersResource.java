@@ -30,6 +30,8 @@ public class ClustersResource extends PortalRESTResource {
       return (this);
     }
 
-    return null;
+    Resource r = new ClusterResource(head);
+    r.setParent(this);
+    return(r.resolve(uri.getTail()));
   }
 }

@@ -3,10 +3,13 @@ package org.olabs.portal.api;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.objectlabs.ws.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +28,26 @@ public class ApiConfig {
   public static final String CLUSTERS_FIELD = "clusters";
 
   @JsonProperty(CLUSTERS_FIELD)
-  private Map<String,String> _clusters;
-  public Map<String,String> getClusters() {
+  private Map<String, String> _clusters;
+
+  public Map<String, String> getClusters() {
     return _clusters;
+  }
+
+  private ConcurrentHashMap<String, MongoClient> clusterConnections = new ConcurrentHashMap<>();
+
+  public MongoClientURI getClusterUri(final String pCluster) {
+    final String uri = getClusters().get(pCluster);
+    return uri == null ? null : new MongoClientURI(uri);
+  }
+
+  public MongoClient getClusterConnection(final String pCluster) {
+    return clusterConnections.computeIfAbsent(
+        pCluster,
+        c -> {
+          final MongoClientURI uri = getClusterUri(c);
+          return uri == null ? null : new MongoClient(uri);
+        });
   }
 
   public static ApiConfig getInstance() throws ResourceException {
@@ -38,7 +58,7 @@ public class ApiConfig {
       }
       try {
         instance = parseConfig(configString);
-      } catch(final IOException e) {
+      } catch (final IOException e) {
         throw new ResourceException(e);
       }
     }

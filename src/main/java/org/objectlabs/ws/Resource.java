@@ -7,134 +7,94 @@ import org.objectlabs.ns.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/******************************************************************************
- * Resource
- *
- * @author William Shulman
- *
- * 05.10.2010
- */
 public class Resource implements WebService {
 
-    /*************************************************************************
-     * logger
-     */
-    private static Logger logger =
-            LoggerFactory.getLogger(Resource.class);
+  private static Logger logger = LoggerFactory.getLogger(Resource.class);
+  private String name;
+  private Namespace parent;
 
-    private static Logger getLogger() {
-        return(logger);
+  private static Logger getLogger() {
+    return (logger);
+  }
+
+  public String getName() {
+    if (name == null) {
+      name = "";
+    }
+    return (name);
+  }
+
+  public void setName(String value) {
+    name = value;
+  }
+
+  public String getAbsoluteName() {
+    String result = "";
+
+    Namespace parent = getParent();
+    if (parent == null) {
+      result = "/" + getName();
+    } else {
+      result = parent.getAbsoluteName() + "/" + getName();
     }
 
-    /*************************************************************************
-     * name
-     */
-    private String name;
+    return (result);
+  }
 
-    public String getName() {
-        if (name == null) {
-            name = "";
-        }
-        return(name);
+  public Namespace getParent() {
+    return (parent);
+  }
+
+  public void setParent(Namespace value) {
+    parent = value;
+  }
+
+  public Namespace getParent(Class c) {
+    Namespace parent = getParent();
+    if (parent == null) {
+      return (null);
     }
 
-    public void setName(String value) {
-        name = value;
+    if (c.isAssignableFrom(parent.getClass())) {
+      return (parent);
     }
 
-    /*************************************************************************
-     * absoluteName
-     */
-    public String getAbsoluteName() {
-        String result = "";
+    return (parent.getParent(c));
+  }
 
-        Namespace parent = getParent();
-        if (parent == null) {
-            result = "/" + getName();
-        } else {
-            result = parent.getAbsoluteName() + "/" + getName();
-        }
-
-        return(result);
+  public Namespace getRoot() {
+    Namespace parent = getParent();
+    if (parent == null) {
+      return (this);
     }
 
-    /*************************************************************************
-     * parent
-     */
-    private Namespace parent;
+    return (parent.getRoot());
+  }
 
-    public Namespace getParent() {
-        return(parent);
+  public Resource resolve(String name) {
+    return (resolve(name == null ? null : new Uri(null, name)));
+  }
+
+  public Resource resolve(Uri uri) {
+    if (uri == null || uri.hasEmptyPath()) {
+      return (this);
     }
 
-    public void setParent(Namespace value) {
-        parent = value;
+    if (uri.isAbsolute()) {
+      Namespace parent = getParent();
+      if (parent != null) {
+        return (Resource) parent.resolve(uri);
+      }
     }
 
-    public Namespace getParent(Class c) {
-        Namespace parent = getParent();
-        if (parent == null) {
-            return(null);
-        }
+    return resolveRelative(uri);
+  }
 
-        if (c.isAssignableFrom(parent.getClass())) {
-            return(parent);
-        }
+  public Resource resolveRelative(Uri uri) {
+    return (null);
+  }
 
-        return(parent.getParent(c));
-    }
-
-    /*************************************************************************
-     * root
-     */
-    public Namespace getRoot() {
-        Namespace parent = getParent();
-        if (parent == null) {
-            return(this);
-        }
-
-        return(parent.getRoot());
-    }
-
-    /*************************************************************************
-     * resolve
-     */
-    public Resource resolve(String name) {
-        return(resolve(name == null ? null : new Uri(null, name)));
-    }
-
-    /*************************************************************************
-     * resolve
-     */
-    public Resource resolve(Uri uri) {
-        if (uri == null || uri.hasEmptyPath()) {
-            return(this);
-        }
-
-        if (uri.isAbsolute()) {
-            Namespace parent = getParent();
-            if (parent != null) {
-                return (Resource) parent.resolve(uri);
-            }
-        }
-
-        return resolveRelative(uri);
-    }
-
-    /*************************************************************************
-     * resolveRelative
-     */
-    public Resource resolveRelative(Uri uri) {
-        return(null);
-    }
-
-    /**************************************************************************
-     * service 
-     */
-    public void service(HttpServletRequest request,
-                        HttpServletResponse response)
-    {
-        getLogger().info("service(): " + getName());
-    }
-
+  public void service(HttpServletRequest request, HttpServletResponse response) {
+    getLogger().info("service(): " + getName());
+  }
 }

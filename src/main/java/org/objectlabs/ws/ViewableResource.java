@@ -11,119 +11,85 @@ import org.slf4j.LoggerFactory;
 
 public class ViewableResource extends Resource implements Viewable {
 
-    /*************************************************************************
-     * VIEW_HTTP_REQUEST_PARAMETER_NAME
-     */
-    private static final String VIEW_HTTP_REQUEST_PARAMETER_NAME = "view";
+  private static final String VIEW_HTTP_REQUEST_PARAMETER_NAME = "view";
 
-    /*************************************************************************
-     * logger                                                                 
-     */
-    private static Logger logger =
-            LoggerFactory.getLogger(WebService.class);
+  private static Logger logger = LoggerFactory.getLogger(WebService.class);
+  private View view;
+  private Map<String, View> views;
 
-    private static Logger getLogger() {
-        return(logger);
+  private static Logger getLogger() {
+    return (logger);
+  }
+
+  public View getView() {
+    return (view);
+  }
+
+  public void setView(View value) {
+    view = value;
+  }
+
+  public Map<String, View> getViews() {
+    if (views == null) {
+      views = new HashMap<String, View>();
+    }
+    return (views);
+  }
+
+  public void setViews(Map<String, View> value) {
+    views = value;
+  }
+
+  public View getView(String viewName) {
+    View result = null;
+
+    Map views = getViews();
+    if (views != null) {
+      result = (View) views.get(viewName);
     }
 
-    /*************************************************************************
-     * view
-     */
-    private View view;
+    return (result);
+  }
 
-    public View getView() {
-        return(view);
-    }
+  public void service(HttpServletRequest request, HttpServletResponse response) {
+    getLogger().info("service(): " + getName());
 
-    public void setView(View value) {
-        view = value;
-    }
+    DBObject model = new BasicDBObject("resource", this);
+    render(model, request, response);
+  }
 
-    /*************************************************************************
-     * views
-     */
-    private Map<String, View> views;
-
-    public Map<String, View> getViews() {
-        if (views == null) {
-            views = new HashMap<String, View>();
+  protected void render(Object result, HttpServletRequest request, HttpServletResponse response) {
+    View view = selectView(request);
+    if (view != null) {
+      view.render(result, this, request, response);
+    } else {
+      try {
+        response.setContentType("text/html; charset=utf-8");
+        response.getWriter().println(result.toString());
+      } catch (Exception e) {
+        throw (new WebServiceException(e));
+      } finally {
+        try {
+          response.getWriter().flush();
+        } catch (Exception e) {
+          getLogger().warn(e.toString());
         }
-        return(views);
+      }
+    }
+  }
+
+  protected View selectView(HttpServletRequest request) {
+    View result = null;
+
+    String viewName = request.getParameter(VIEW_HTTP_REQUEST_PARAMETER_NAME);
+    if (viewName != null) {
+      result = getView(viewName);
     }
 
-    public void setViews(Map<String, View> value) {
-        views = value;
+    if (result == null) {
+      return (getView());
     }
 
-    /*************************************************************************
-     * getView
-     */
-    public View getView(String viewName) {
-        View result = null;
-
-        Map views = getViews();
-        if (views != null) {
-            result = (View)views.get(viewName);
-        }
-
-        return(result);
-    }
-
-    /**************************************************************************
-     * service 
-     */
-    public void service(HttpServletRequest request,
-                        HttpServletResponse response)
-    {
-        getLogger().info("service(): " + getName());
-
-        DBObject model = new BasicDBObject("resource", this);
-        render(model, request, response);
-    }
-
-    /*************************************************************************
-     * render
-     */
-    protected void render(Object result,
-                          HttpServletRequest request,
-                          HttpServletResponse response)
-    {
-        View view = selectView(request);
-        if (view != null) {
-            view.render(result, this, request, response);
-        } else {
-            try {
-                response.setContentType("text/html; charset=utf-8");
-                response.getWriter().println(result.toString());
-            } catch (Exception e) {
-                throw(new WebServiceException(e));
-            } finally {
-                try {
-                    response.getWriter().flush();
-                } catch (Exception e) {
-                    getLogger().warn(e.toString());
-                }
-            }
-        }
-    }
-
-    /*************************************************************************
-     * selectView
-     */
-    protected View selectView(HttpServletRequest request) {
-        View result = null;
-
-        String viewName =
-                request.getParameter(VIEW_HTTP_REQUEST_PARAMETER_NAME);
-        if (viewName != null) {
-            result = getView(viewName);
-        }
-
-        if (result == null) {
-            return(getView());
-        }
-
-        return(result);
-    }
-
+    return (result);
+  }
 }

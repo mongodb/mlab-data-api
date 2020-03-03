@@ -45,9 +45,6 @@ public class JsonParser {
     public void setDb ( DB db )
     { mDb = db; }
 
-    /*******************************************************************
-     * parse
-     */
     public Object parse(String json) {
         return(parse(new StringReader(json)));
     }
@@ -70,9 +67,6 @@ public class JsonParser {
         return tokenizer;
     }
 
-    /*******************************************************************
-     * mongoParse
-     */
     public static Object mongoParse(BufferedReader in) throws JsonParseException {
         String r;
         String body = "";
@@ -92,9 +86,6 @@ public class JsonParser {
         }
     }
 
-    /*******************************************************************
-     * mongoParse
-     */
     public static Object mongoParse(String json) throws JsonParseException {
         try {
             return JSON.parse(json);
@@ -103,9 +94,6 @@ public class JsonParser {
         }
     }
 
-    /*******************************************************************
-     * mongoParse
-     */
     public static Object mongoParse(String json, DB db) throws JsonParseException {
         try {
             return JSON.parse(json);
@@ -114,9 +102,6 @@ public class JsonParser {
         }
     }
 
-    /*******************************************************************
-     * read
-     */
     private Object read(StreamTokenizer in) {
         Object result = null;
 
@@ -161,9 +146,6 @@ public class JsonParser {
         return(result);
     }
 
-    /*******************************************************************
-     * readNumber
-     */
     private Number readNumber(StreamTokenizer in) {
         double d = in.nval;
 
@@ -174,9 +156,6 @@ public class JsonParser {
         return(new Double(in.nval));
     }
 
-    /*******************************************************************
-     * readWord
-     */
     private Object readWord(StreamTokenizer in) {
         Object result = null;
 
@@ -195,16 +174,10 @@ public class JsonParser {
         return(result);
     }
 
-    /*******************************************************************
-     * readString
-     */
     private String readString(StreamTokenizer in) {
         return(in.sval);
     }
 
-    /*******************************************************************
-     * readArray
-     */
     private List readArray(StreamTokenizer in) {
         BasicDBList result = new BasicDBList();
 
@@ -220,9 +193,6 @@ public class JsonParser {
         return(result);
     }
 
-    /*******************************************************************
-     * readObject
-     */
     private DBObject readObject(StreamTokenizer in) {
         DBObject result = new BasicDBObject();
 
@@ -243,9 +213,6 @@ public class JsonParser {
         return(result);
     }
 
-    /*******************************************************************
-     * readFieldName
-     */
     private String readFieldName(StreamTokenizer in) {
         String result = null;
 
@@ -266,9 +233,6 @@ public class JsonParser {
         return(result);
     }
 
-    /*******************************************************************
-     * readToken
-     */
     private int readToken(StreamTokenizer in) {
         try {
             return(in.nextToken());
@@ -278,9 +242,6 @@ public class JsonParser {
         }
     }
 
-    /*******************************************************************
-     * read
-     */
     private int readToken(StreamTokenizer in, int c) {
         if (peek(in) != c) {
             throw(new JsonParseException("Expecting: '" + (char)c + "' but " +
@@ -291,21 +252,12 @@ public class JsonParser {
         return(readToken(in));
     }
 
-    /*******************************************************************
-     * peek
-     */
     private int peek(StreamTokenizer in) {
         int result = readToken(in);
         in.pushBack();
         return(result);
     }
 
-    /*******************************************************************
-     * constructExtendedJsonFromBinary(byte[] binData)
-     *  - given a byte[] without a (byte) type, construct an org.bson.types.Binary
-     *    object from the byte[], which will generate the generic type '00'
-     *    then pass these to constructExtendedJsonFromBinary(byte type, byte[] data)
-     */
     public static BasicDBObject constructExtendedJsonFromBinary(byte[] binData) {
         Binary binDataType = new Binary(binData);
         byte type = binDataType.getType();
@@ -314,13 +266,6 @@ public class JsonParser {
         return constructExtendedJsonFromBinary(type, data);
     }
 
-    /*******************************************************************
-     * constructExtendedJsonFromBinary(byte type, byte[] data)
-     *  - given an instance of byte[] and a (byte) type,
-     *    construct valid Extended JSON from the Binary class attributes
-     *    according to the specification at
-     *    https://docs.mongodb.com/manual/reference/mongodb-extended-json/#data_binary
-     */
     public static BasicDBObject constructExtendedJsonFromBinary(byte type, byte[] data) {
 
         String base64Data = Base64.getEncoder().encodeToString(data);
@@ -333,11 +278,6 @@ public class JsonParser {
         return constructedBinaryDataExtendedJson;
     }
 
-    /*******************************************************************
-     * convertBinaryTypesToJson
-     *  - crawl a DBObject, and call 'constructExtendedJsonFromBinary'
-     *    on any members that are instances of byte[]
-     */
     public static void convertBinaryTypesToJson(DBObject obj) {
         for(String key : obj.keySet()) {
             if (obj.get(key) instanceof DBObject) {
@@ -352,9 +292,6 @@ public class JsonParser {
         }
     }
 
-    /*******************************************************************
-     * serialize
-     */
     public String serialize(Object o) {
         /**
          * JSON.serialize is deprecated, and does not output valid JSON for
@@ -374,9 +311,6 @@ public class JsonParser {
         return(JSON.serialize(o));
     }
 
-    /*******************************************************************
-     * serialize
-     */
     public void serialize(Object o, Writer w) throws IOException {
         if ( o instanceof List ) {
             w.write("[ ");
@@ -420,9 +354,6 @@ public class JsonParser {
         throw new UnsupportedOperationException("Cannot convert type: " + o.getClass().getName());
     }
 
-    /*******************************************************************
-     * deepRemoveField - deeply removes key from object
-     */
     public static void deepRemoveField(String field, Object dbo) {
         deepRemoveField(field, dbo, true);
     }

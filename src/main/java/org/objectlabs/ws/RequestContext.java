@@ -5,16 +5,10 @@ import javax.servlet.http.HttpServletResponse;
 
 public class RequestContext {
 
-    /*************************************************************************
-     * Constructor                                                 
-     */
     public RequestContext() {
         super();
     }
 
-    /*************************************************************************
-     * servletRequest
-     */
     private HttpServletRequest servletRequest;
 
     public HttpServletRequest getServletRequest() {
@@ -25,9 +19,6 @@ public class RequestContext {
         servletRequest = value;
     }
 
-    /*************************************************************************
-     * servletResponse
-     */
     private HttpServletResponse servletResponse;
 
     public HttpServletResponse getServletResponse() {

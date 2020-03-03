@@ -5,30 +5,14 @@ import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
 
-/******************************************************************************
- * Path
- *
- * @author William Shulman
- *
- * 05.24.2010
- */
 public class Path {
 
-    /*******************************************************************
-     * Constructor
-     */
     private static final String PATH_SEPARATOR = "/";
 
-    /*******************************************************************
-     * Constructor
-     */
     public Path() {
         super();
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Path(String path) {
         if (path != null) {
             if (path.startsWith(PATH_SEPARATOR)) {
@@ -38,24 +22,15 @@ public class Path {
         }
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Path(List<String> path) {
         this(path, false);
     }
 
-    /*******************************************************************
-     * Constructor
-     */
     public Path(List<String> path, boolean isAbsolute) {
         setPath(path);
         setAbsolute(isAbsolute);
     }
 
-    /*******************************************************************
-     * path
-     */
     private List<String> path;
 
     public List<String> getPath() {
@@ -67,9 +42,6 @@ public class Path {
         path = value;
     }
 
-    /*******************************************************************
-     * absolute
-     */
     private boolean absolute = false;
 
     public boolean isAbsolute() {
@@ -80,16 +52,10 @@ public class Path {
         absolute = value;
     }
 
-    /*******************************************************************
-     * empty
-     */
     public boolean isEmpty() {
         return(getPath().isEmpty());
     }
 
-    /*******************************************************************
-     * head
-     */
     public String getHead() {
         List<String> path = getPath();
         if (path.isEmpty()) {
@@ -98,9 +64,6 @@ public class Path {
         return(path.get(0));
     }
 
-    /*******************************************************************
-     * tail
-     */
     public Path getTail() {
         List<String> path = getPath();
         if (path.isEmpty()) {
@@ -109,9 +72,6 @@ public class Path {
         return(new Path(path.subList(1, path.size())));
     }
 
-    /*******************************************************************
-     * parent
-     */
     public Path getParent() {
         List<String> path = getPath();
         if (path.size() < 2) {
@@ -121,9 +81,6 @@ public class Path {
         return(new Path(path.subList(0, path.size() - 1), isAbsolute()));
     }
 
-    /*******************************************************************
-     * toString
-     */
     public String toString() {
         StringBuffer buff = new StringBuffer();
         if (isAbsolute()) {
@@ -142,9 +99,6 @@ public class Path {
         return(buff.toString());
     }
 
-    /*******************************************************************
-     * parsePath
-     */
     protected List<String> parsePath(String path) {
         List result = new ArrayList();
 
