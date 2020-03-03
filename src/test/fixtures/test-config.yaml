@@ -1,0 +1,3 @@
+port: 5678
+clusters:
+  foo: mongodb://user:pass@localhost:27001/admin

@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public class ApiConfig {
   public static final String PORT_FIELD = "port";
   private static final Logger LOG = LoggerFactory.getLogger(ApiConfig.class);
-  private static final String CONFIG_FILE_ENV_VAR = "MLAB_DATA_API_CONFIG";
+  private static final String CONFIG_ENV_VAR = "MLAB_DATA_API_CONFIG";
   private static final String API_KEY_ENV_VAR = "MLAB_DATA_API_KEY";
   private static ApiConfig instance;
   private static String apiKey;
@@ -52,17 +52,20 @@ public class ApiConfig {
 
   public static ApiConfig getInstance() throws ResourceException {
     if (instance == null) {
-      final String configString = System.getenv(CONFIG_FILE_ENV_VAR);
-      if (configString == null) {
-        throw new ResourceException(String.format("%s is missing", CONFIG_FILE_ENV_VAR));
-      }
-      try {
-        instance = parseConfig(configString);
-      } catch (final IOException e) {
-        throw new ResourceException(e);
-      }
+      instance = getInstance(System.getenv(CONFIG_ENV_VAR));
     }
     return instance;
+  }
+
+  public static ApiConfig getInstance(final String pConfigString) throws ResourceException {
+    if (pConfigString == null) {
+      throw new ResourceException(String.format("%s is missing", CONFIG_ENV_VAR));
+    }
+    try {
+      return parseConfig(pConfigString);
+    } catch (final IOException e) {
+      throw new ResourceException(e);
+    }
   }
 
   public static String getApiKey() {
