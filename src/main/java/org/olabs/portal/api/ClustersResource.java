@@ -1,5 +1,6 @@
 package org.olabs.portal.api;
 
+import java.util.Collections;
 import java.util.Map;
 import org.objectlabs.http.HttpMethod;
 import org.objectlabs.ns.Uri;
@@ -17,7 +18,8 @@ public class ClustersResource extends PortalRESTResource {
 
   @Override
   public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
-    return ApiConfig.getInstance().getClusters().keySet();
+    final Map<String, String> clusters = ApiConfig.getInstance().getClusters();
+    return clusters == null ? Collections.emptyList() : clusters.keySet();
   }
 
   public Resource resolveRelative(Uri uri) {
@@ -32,6 +34,6 @@ public class ClustersResource extends PortalRESTResource {
 
     Resource r = new ClusterResource(head);
     r.setParent(this);
-    return(r.resolve(uri.getTail()));
+    return (r.resolve(uri.getTail()));
   }
 }
