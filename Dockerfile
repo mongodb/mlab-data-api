@@ -1,6 +1,14 @@
-FROM openjdk:11-jdk-slim
-COPY . /home/gradle/src
+FROM gradle:jdk11 as builder
+COPY --chown=gradle:gradle . /home/gradle/src
 WORKDIR /home/gradle/src
-RUN ./gradlew build
-CMD ./gradlew run
+RUN gradle distTar
 
+FROM openjdk:11-jre-slim
+
+ARG VERSION=1.0
+
+WORKDIR /app
+COPY --from=builder /home/gradle/src/build/distributions/mlab-data-api-$VERSION.tar /app/
+RUN tar -xvf mlab-data-api-$VERSION.tar
+WORKDIR mlab-data-api-$VERSION
+CMD bin/mlab-data-api

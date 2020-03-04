@@ -9,7 +9,7 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.objectlabs.ws.ResourceException;
 
 public class Main {
-  private static final String WEB_APP_DIR = "src/main/webapp";
+  private static final String WEB_APP_DIR = "www";
 
   public static void main(String[] args) throws Exception {
     final Tomcat tomcat = new Tomcat();

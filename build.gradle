@@ -2,9 +2,10 @@ plugins {
     id 'java'
     id 'application'
     id 'war'
+    id 'distribution'
 }
 
-version '1.0-SNAPSHOT'
+version '1.0'
 
 sourceCompatibility = 1.11
 
@@ -14,6 +15,17 @@ ext {
 
 application {
     mainClassName = javaMainClass
+}
+
+distributions {
+    main {
+        baseName = 'mlab-data-api'
+        contents {
+            from('src/main/webapp') {
+                into('www')
+            }
+        }
+    }
 }
 
 repositories {
