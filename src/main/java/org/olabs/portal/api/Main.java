@@ -9,10 +9,9 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.objectlabs.ws.ResourceException;
 
 public class Main {
-  private static final String WEB_APP_DIR = "src/main/api";
+  private static final String WEB_APP_DIR = "src/main/webapp";
 
   public static void main(String[] args) throws Exception {
-    System.out.println("Starting mLab Data API...");
     final Tomcat tomcat = new Tomcat();
     try {
       tomcat.setPort(ApiConfig.getInstance().getPort());
@@ -24,10 +23,13 @@ public class Main {
         (StandardContext) tomcat.addWebapp("", new File(WEB_APP_DIR).getAbsolutePath());
     final WebResourceRoot resources = new StandardRoot(ctx);
     final File additionWebInfClasses = new File("target/classes");
-    resources.addPreResources(
-        new DirResourceSet(
-            resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
+    if (additionWebInfClasses.isDirectory() && additionWebInfClasses.exists()) {
+      resources.addPreResources(
+          new DirResourceSet(
+              resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
+    }
     ctx.setResources(resources);
+    System.out.println("Starting mLab Data API...");
     tomcat.start();
     tomcat.getServer().await();
   }
