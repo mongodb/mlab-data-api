@@ -23,5 +23,5 @@ docker build .
 ### Run
 
 ```
-docker run -e MLAB_DATA_API_CONFIG='{port: [PORT], clusters: [...]}' -e MLAB_DATA_API_KEY=[KEY] [IMAGE]
+docker run -e MLAB_DATA_API_CONFIG='{port: [PORT], clusters: [...]}' -e MLAB_DATA_API_KEY=[KEY] -p [PORT]:[PORT] [IMAGE]
 ```
