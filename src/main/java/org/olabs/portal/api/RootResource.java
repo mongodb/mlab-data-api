@@ -25,6 +25,7 @@ public class RootResource extends HttpRequestResource {
   public static List<Resource> makeChildren(Resource r) {
     List<Resource> children = new ArrayList<Resource>(2);
     children.add(makeClustersResource(r));
+    children.add(makeDatabasesResource(r));
     return children;
   }
 
@@ -35,14 +36,10 @@ public class RootResource extends HttpRequestResource {
     return result;
   }
 
-  /*
-
   private static Resource makeDatabasesResource(Resource parent) {
-    Resource result = new AccountDatabasesResource();
+    Resource result = new DatabasesResource();
     result.setName("databases");
     result.setParent(parent);
     return result;
   }
- */
-
 }

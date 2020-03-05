@@ -2,6 +2,7 @@ package org.olabs.portal.api;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.MongoClient;
+import com.mongodb.client.MongoDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -15,9 +16,9 @@ import org.objectlabs.ws.RequestContext;
 import org.objectlabs.ws.Resource;
 import org.objectlabs.ws.WebServiceException;
 
-public class GenericDatabasesResource extends PortalRESTResource implements MongoBegotten {
+public class MongoDBConnectionResource extends PortalRESTResource implements MongoBegotten {
 
-  public GenericDatabasesResource(MongoClient mongo) {
+  public MongoDBConnectionResource(MongoClient mongo) {
     this.mongo = mongo;
   }
 
@@ -66,14 +67,12 @@ public class GenericDatabasesResource extends PortalRESTResource implements Mong
     if (dbName == null) {
       return null;
     }
-    /*
-    DB db = getMongo().getDB(dbName);
+    MongoDatabase db = getMongo().getDatabase(dbName);
     if (db != null) {
         result = new DatabaseResource(db);
         result.setParent(this);
         return result.resolve(uri.getTail());
     }
-     */
 
     return (result);
   }

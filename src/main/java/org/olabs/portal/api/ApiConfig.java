@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 public class ApiConfig {
   public static final String PORT_FIELD = "port";
+  public static final String CLUSTERS_FIELD = "clusters";
+  public static final String DATABASES_FIELD = "databases";
   private static final Logger LOG = LoggerFactory.getLogger(ApiConfig.class);
   private static final String CONFIG_ENV_VAR = "MLAB_DATA_API_CONFIG";
   private static final String API_KEY_ENV_VAR = "MLAB_DATA_API_KEY";
@@ -25,30 +27,15 @@ public class ApiConfig {
   @JsonProperty(PORT_FIELD)
   private int _port;
 
-  public static final String CLUSTERS_FIELD = "clusters";
-
   @JsonProperty(CLUSTERS_FIELD)
   private Map<String, String> _clusters;
 
-  public Map<String, String> getClusters() {
-    return _clusters;
-  }
+  @JsonProperty(DATABASES_FIELD)
+  private Map<String, String> _databases;
 
   private ConcurrentHashMap<String, MongoClient> clusterConnections = new ConcurrentHashMap<>();
 
-  public MongoClientURI getClusterUri(final String pCluster) {
-    final String uri = getClusters().get(pCluster);
-    return uri == null ? null : new MongoClientURI(uri);
-  }
-
-  public MongoClient getClusterConnection(final String pCluster) {
-    return clusterConnections.computeIfAbsent(
-        pCluster,
-        c -> {
-          final MongoClientURI uri = getClusterUri(c);
-          return uri == null ? null : new MongoClient(uri);
-        });
-  }
+  private ConcurrentHashMap<String, MongoClient> databaseConnections = new ConcurrentHashMap<>();
 
   public static ApiConfig getInstance() throws ResourceException {
     if (instance == null) {
@@ -96,6 +83,42 @@ public class ApiConfig {
         throw e;
       }
     }
+  }
+
+  public Map<String, String> getClusters() {
+    return _clusters;
+  }
+
+  public Map<String, String> getDatabases() {
+    return _databases;
+  }
+
+  public MongoClientURI getClusterUri(final String pCluster) {
+    final String uri = getClusters().get(pCluster);
+    return uri == null ? null : new MongoClientURI(uri);
+  }
+
+  public MongoClient getClusterConnection(final String pCluster) {
+    return clusterConnections.computeIfAbsent(
+        pCluster,
+        c -> {
+          final MongoClientURI uri = getClusterUri(c);
+          return uri == null ? null : new MongoClient(uri);
+        });
+  }
+
+  public MongoClientURI getDatabaseUri(final String pDatabase) {
+    final String uri = getDatabases().get(pDatabase);
+    return uri == null ? null : new MongoClientURI(uri);
+  }
+
+  public MongoClient getDatabaseConnection(final String pDatabase) {
+    return databaseConnections.computeIfAbsent(
+        pDatabase,
+        c -> {
+          final MongoClientURI uri = getDatabaseUri(c);
+          return uri == null ? null : new MongoClient(uri);
+        });
   }
 
   public int getPort() {
