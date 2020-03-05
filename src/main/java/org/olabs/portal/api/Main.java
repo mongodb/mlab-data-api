@@ -10,6 +10,7 @@ import org.objectlabs.ws.ResourceException;
 
 public class Main {
   private static final String WEB_APP_DIR = "www";
+  private static final String WEB_APP_PATH = "/api/1";
 
   public static void main(String[] args) throws Exception {
     final Tomcat tomcat = new Tomcat();
@@ -20,7 +21,7 @@ public class Main {
       System.exit(1);
     }
     final StandardContext ctx =
-        (StandardContext) tomcat.addWebapp("", new File(WEB_APP_DIR).getAbsolutePath());
+        (StandardContext) tomcat.addWebapp(WEB_APP_PATH, new File(WEB_APP_DIR).getAbsolutePath());
     final WebResourceRoot resources = new StandardRoot(ctx);
     final File additionWebInfClasses = new File("target/classes");
     if (additionWebInfClasses.isDirectory() && additionWebInfClasses.exists()) {
