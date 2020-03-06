@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <logger name="org.apache" level="INFO" />
-    <logger name="httpclient" level="INFO" />
+    <!-- Mitigate 60x (!!) performance hit for unlogged java.util.logging (JUL) statements mentioned here:
+           http://www.slf4j.org/legacy.html#jul-to-slf4j -->
+    <contextListener class="ch.qos.logback.classic.jul.LevelChangePropagator">
+        <resetJUL>true</resetJUL>
+    </contextListener>
+
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSSZ} %-5level [%thread] %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Work around MyPort.error issue and other abuses -->
+    <logger name="com.mongodb" level="warn"/>
+    <logger name="org.mongodb" level="warn"/>
+
+    <root level="info">
+        <appender-ref ref="stdout" />
+    </root>
 </configuration>

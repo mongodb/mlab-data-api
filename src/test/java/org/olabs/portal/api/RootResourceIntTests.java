@@ -13,7 +13,7 @@ public class RootResourceIntTests extends BaseResourceTest {
   @Test
   public void testGet() throws IOException {
     try {
-       doGet("");
+       getTestClient().get("");
        fail("Expected GET / to fail");
     } catch(final ResourceException e) {
       assertEquals(HttpStatus.SC_NOT_FOUND, e.getStatusCode());

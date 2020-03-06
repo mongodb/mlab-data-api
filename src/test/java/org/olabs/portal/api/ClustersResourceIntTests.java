@@ -12,10 +12,15 @@ public class ClustersResourceIntTests extends BaseResourceTest {
 
   @Test
   public void testGet() throws IOException {
-    final JSONArray clusters = doJsonArrayGet("clusters");
+    final JSONArray clusters = getTestClient().getJsonArray("clusters");
     assertNotNull(clusters);
     assertEquals(2, clusters.length());
-    assertTrue(clusters.toList().contains("rs-ds253817"));
+    assertTrue(clusters.toList().contains("rs-ds113926"));
     assertTrue(clusters.toList().contains("rs-ds253357"));
+
+    final JSONArray prodClusters = getProductionClient().getJsonArray("clusters");
+    assertNotNull(prodClusters);
+    assertTrue(prodClusters.toList().contains("rs-ds113926"));
+    assertTrue(prodClusters.toList().contains("rs-ds253357"));
   }
 }
