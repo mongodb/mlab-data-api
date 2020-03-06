@@ -7,7 +7,9 @@ plugins {
 
 version '1.0'
 
-sourceCompatibility = 1.11
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_10
+}
 
 ext {
     javaMainClass = 'org.olabs.portal.api.Main'
@@ -40,16 +42,16 @@ dependencies {
     compile 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.10.2'
     compile 'commons-cli:commons-cli:1.4'
     compile 'commons-io:commons-io:2.1'
-    compile 'junit:junit:4.12'
     compile 'org.apache.httpcomponents:httpclient:4.5.11'
     compile 'org.apache.tomcat.embed:tomcat-embed-core:8.5.32'
     compile 'org.apache.tomcat.embed:tomcat-embed-jasper:8.5.32'
     compile 'org.apache.tomcat:tomcat-jasper:8.5.32'
     compile 'org.json:json:20190722'
-    compile 'org.mockito:mockito-core:2.28.2'
     compile 'org.mongodb:mongo-java-driver:3.12.1'
     compile 'org.slf4j:jcl-over-slf4j:1.7.30'
     compile 'org.slf4j:jul-to-slf4j:1.7.30'
     compile 'org.slf4j:log4j-over-slf4j:1.7.30'
     compile 'org.slf4j:slf4j-api:1.7.30'
+    testImplementation 'junit:junit:4.12'
+    testImplementation 'org.mockito:mockito-core:2.28.2'
 }
