@@ -22,17 +22,17 @@ public class Main {
     System.setProperty(ApiConfig.CONFIG_PROPERTY, System.getenv(CONFIG_ENV_VAR));
     System.setProperty(ApiConfig.API_KEY_PROPERTY, System.getenv(API_KEY_ENV_VAR));
     System.setProperty(ApiConfig.APP_DIR_PROPERTY, WEB_APP_DIR);
-    start(ApiConfig.getInstance().getPort());
+    start();
     _tomcat.getServer().await();
   }
 
-  public static void start(final int pPort) throws LifecycleException, ServletException {
+  public static void start() throws LifecycleException, ServletException {
     if (_tomcat != null) {
       return;
     }
     _tomcat = new Tomcat();
     try {
-      _tomcat.setPort(pPort);
+      _tomcat.setPort(ApiConfig.getInstance().getPort());
     } catch (final ResourceException e) {
       System.out.println(String.format("Error getting config: %s", e.getMessage()));
       System.exit(1);

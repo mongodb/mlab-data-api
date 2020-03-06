@@ -19,20 +19,21 @@ import org.junit.Before;
 import org.objectlabs.ws.ResourceException;
 
 public abstract class BaseResourceTest {
-  private static final int TEST_PORT = 8080;
+  private static final String TEST_CONFIG_ENV_VAR = "MLAB_DATA_API_TEST_CONFIG";
   private static final String TEST_API_KEY = "PggfZYDE6EWh2FCLsvGm42cq";
   private CloseableHttpClient _client = HttpClients.createMinimal();
 
   @Before
   public void setUp() throws Exception {
     System.setProperty(ApiConfig.APP_DIR_PROPERTY, "src/main/webapp");
-    System.setProperty(ApiConfig.CONFIG_PROPERTY, getApiConfig());
+    final String config = System.getenv(TEST_CONFIG_ENV_VAR);
+    if (config == null) {
+      throw new AssertionError(
+          String.format("%s environment variable is required", TEST_CONFIG_ENV_VAR));
+    }
+    System.setProperty(ApiConfig.CONFIG_PROPERTY, config);
     System.setProperty(ApiConfig.API_KEY_PROPERTY, TEST_API_KEY);
-    Main.start(TEST_PORT);
-  }
-
-  public String getApiConfig() {
-    return TestUtils.getTestApiConfigString();
+    Main.start();
   }
 
   public String doGet(final String pPath) throws IOException {
@@ -64,7 +65,10 @@ public abstract class BaseResourceTest {
   }
 
   private String getPathUrl(final String pPath) throws MalformedURLException {
-    final URL url = new URL(String.format("http://localhost:%s/api/1/%s", TEST_PORT, pPath));
+    final URL url =
+        new URL(
+            String.format(
+                "http://localhost:%s/api/1/%s", ApiConfig.getInstance().getPort(), pPath));
     final String delim = url.getQuery() == null || url.getQuery().isEmpty() ? "?" : "&";
     return String.format("%s%sapiKey=%s", url.toString(), delim, TEST_API_KEY);
   }
