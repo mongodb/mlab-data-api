@@ -54,7 +54,7 @@ public class MongoDBConnectionResource extends PortalRESTResource implements Mon
 
   private Collection<String> getDbNames() {
     final String authDb =
-        ApiConfig.getInstance().getClusterUri(getParent().getName()).getDatabase();
+        getApiConfig().getClusterUri(getParent().getName()).getDatabase();
     return authDb.equals(MongoUtils.ADMIN_DB_NAME)
         ? getMongo().listDatabaseNames().into(new ArrayList<>())
         : List.of(authDb);

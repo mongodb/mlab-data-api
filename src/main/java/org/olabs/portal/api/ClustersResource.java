@@ -18,7 +18,7 @@ public class ClustersResource extends PortalRESTResource {
 
   @Override
   public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
-    final Map<String, String> clusters = ApiConfig.getInstance().getClusters();
+    final Map<String, String> clusters = getApiConfig().getClusters();
     return clusters == null ? Collections.emptyList() : clusters.keySet();
   }
 

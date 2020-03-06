@@ -23,10 +23,30 @@ public class ApiConfigUnitTests {
 
   @Test
   public void testGetInstance_json() {
-    final String raw = "{port: 1234}";
-    final ApiConfig config = ApiConfig.getInstance(raw);
+    final ApiConfig config = TestUtils.getTestApiConfig();
     assertNotNull(config);
     assertEquals(1234, config.getPort());
+    assertEquals(2, config.getClusters().size());
+    final MongoClientURI uriA = config.getClusterUri("a");
+    assertNotNull(uriA);
+    assertEquals("user", uriA.getUsername());
+    assertEquals("host-a:27001", uriA.getHosts().get(0));
+    assertEquals("admin", uriA.getDatabase());
+    final MongoClientURI uriB = config.getClusterUri("b");
+    assertNotNull(uriB);
+    assertEquals("user", uriB.getUsername());
+    assertEquals("host-b:27001", uriB.getHosts().get(0));
+    assertEquals("admin", uriB.getDatabase());
+    final MongoClientURI uriFoo = config.getDatabaseUri("foo");
+    assertNotNull(uriFoo);
+    assertEquals("user", uriFoo.getUsername());
+    assertEquals("host-c:27001", uriFoo.getHosts().get(0));
+    assertEquals("foo", uriFoo.getDatabase());
+    final MongoClientURI uriBar = config.getDatabaseUri("bar");
+    assertNotNull(uriBar);
+    assertEquals("user", uriBar.getUsername());
+    assertEquals("host-d:27001", uriBar.getHosts().get(0));
+    assertEquals("bar", uriBar.getDatabase());
   }
 
   @Test
@@ -35,11 +55,28 @@ public class ApiConfigUnitTests {
     final ApiConfig config = ApiConfig.getInstance(file);
     assertNotNull(config);
     assertEquals(5678, config.getPort());
-    assertEquals(1, config.getClusters().size());
-    final MongoClientURI uri = config.getClusterUri("foo");
-    assertNotNull(uri);
-    assertEquals("user", uri.getUsername());
-    assertEquals("admin", uri.getDatabase());
-    assertEquals("localhost:27001", uri.getHosts().get(0));
+    assertEquals(2, config.getClusters().size());
+    final MongoClientURI uriA = config.getClusterUri("a");
+    assertNotNull(uriA);
+    assertEquals("user", uriA.getUsername());
+    assertEquals("admin", uriA.getDatabase());
+    assertEquals("host-a:27001", uriA.getHosts().get(0));
+    final MongoClientURI uriB = config.getClusterUri("b");
+    assertNotNull(uriB);
+    assertEquals("user", uriB.getUsername());
+    assertEquals("admin", uriB.getDatabase());
+    assertEquals(2, uriB.getHosts().size());
+    assertEquals("host-b0:27001", uriB.getHosts().get(0));
+    assertEquals("host-b1:27001", uriB.getHosts().get(1));
+    final MongoClientURI uriFoo = config.getDatabaseUri("foo");
+    assertNotNull(uriFoo);
+    assertEquals("user", uriFoo.getUsername());
+    assertEquals("host-c:27001", uriFoo.getHosts().get(0));
+    assertEquals("foo", uriFoo.getDatabase());
+    final MongoClientURI uriBar = config.getDatabaseUri("bar");
+    assertNotNull(uriBar);
+    assertEquals("user", uriBar.getUsername());
+    assertEquals("host-d:27001", uriBar.getHosts().get(0));
+    assertEquals("bar", uriBar.getDatabase());
   }
 }

@@ -1,3 +1,7 @@
 port: 5678
 clusters:
-  foo: mongodb://user:pass@localhost:27001/admin
+  a: mongodb://user:pass@host-a:27001/admin
+  b: mongodb://user:pass@host-b0:27001,host-b1:27001/admin
+databases:
+  foo: mongodb://user:pass@host-c:27001/foo
+  bar: mongodb://user:pass@host-d:27001/bar

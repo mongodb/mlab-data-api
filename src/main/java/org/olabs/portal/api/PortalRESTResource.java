@@ -35,6 +35,10 @@ public abstract class PortalRESTResource extends RestResource {
         return r == null ? null : r.getRequest();
     }
 
+    public ApiConfig getApiConfig() {
+        return ApiConfig.getInstance();
+    }
+
     @Override
     protected Object getObjectFromRequestBody(HttpServletRequest request) {
         try {

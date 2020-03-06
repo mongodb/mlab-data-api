@@ -18,7 +18,7 @@ public class DatabasesResource extends PortalRESTResource {
 
   @Override
   public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
-    final Map<String, String> clusters = ApiConfig.getInstance().getDatabases();
+    final Map<String, String> clusters = getApiConfig().getDatabases();
     return clusters == null ? Collections.emptyList() : clusters.keySet();
   }
 
@@ -33,7 +33,7 @@ public class DatabasesResource extends PortalRESTResource {
     }
 
     Resource r =
-        new MongoDBConnectionResource(ApiConfig.getInstance().getDatabaseConnection(head))
+        new MongoDBConnectionResource(getApiConfig().getDatabaseConnection(head))
             .resolve(head);
     r.setParent(this);
     return (r.resolve(uri.getTail()));

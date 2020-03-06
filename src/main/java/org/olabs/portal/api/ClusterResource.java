@@ -26,7 +26,7 @@ public class ClusterResource extends PortalRESTResource {
     String head = uri.getHead();
     Resource r = null;
     if (head.equals("databases")) {
-      r = new MongoDBConnectionResource(ApiConfig.getInstance().getClusterConnection(getName()));
+      r = new MongoDBConnectionResource(getApiConfig().getClusterConnection(getName()));
       /*
     } else if (head.equals("runCommand")) {
       r = new RunCommandResource(getCluster().getDb("admin"));
