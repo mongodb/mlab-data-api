@@ -1,7 +1,8 @@
 package org.olabs.portal.api;
 
 public class TestUtils {
-  public static ApiConfig getTestApiConfig() {
+
+  public static String getTestApiConfigString() {
     final StringBuilder raw = new StringBuilder();
     raw.append("{");
     raw.append("port: 1234,");
@@ -12,6 +13,10 @@ public class TestUtils {
     raw.append("foo: 'mongodb://user:pass@host-c:27001/foo',");
     raw.append("bar: 'mongodb://user:pass@host-d:27001/bar'}");
     raw.append("}");
-    return ApiConfig.getInstance(raw.toString());
+    return raw.toString();
+  }
+
+  public static ApiConfig getTestApiConfig() {
+    return ApiConfig.getInstance(getTestApiConfigString());
   }
 }

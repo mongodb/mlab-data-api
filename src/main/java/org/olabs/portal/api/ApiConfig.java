@@ -15,12 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ApiConfig {
+  public static final String CONFIG_PROPERTY = "mlab.apiConfig";
+  public static final String API_KEY_PROPERTY = "mlab.apiKey";
+  public static final String APP_DIR_PROPERTY = "mlab.appDir";
   public static final String PORT_FIELD = "port";
   public static final String CLUSTERS_FIELD = "clusters";
   public static final String DATABASES_FIELD = "databases";
   private static final Logger LOG = LoggerFactory.getLogger(ApiConfig.class);
-  private static final String CONFIG_ENV_VAR = "MLAB_DATA_API_CONFIG";
-  private static final String API_KEY_ENV_VAR = "MLAB_DATA_API_KEY";
   private static ApiConfig instance;
   private static String apiKey;
 
@@ -39,14 +40,14 @@ public class ApiConfig {
 
   public static ApiConfig getInstance() throws ResourceException {
     if (instance == null) {
-      instance = getInstance(System.getenv(CONFIG_ENV_VAR));
+      instance = getInstance(System.getProperty(CONFIG_PROPERTY));
     }
     return instance;
   }
 
   public static ApiConfig getInstance(final String pConfigString) throws ResourceException {
     if (pConfigString == null) {
-      throw new ResourceException(String.format("%s is missing", CONFIG_ENV_VAR));
+      throw new ResourceException("Config is missing");
     }
     try {
       return parseConfig(pConfigString);
@@ -57,7 +58,7 @@ public class ApiConfig {
 
   public static String getApiKey() {
     if (apiKey == null) {
-      apiKey = System.getenv(API_KEY_ENV_VAR);
+      apiKey = System.getProperty(API_KEY_PROPERTY);
     }
     return apiKey;
   }

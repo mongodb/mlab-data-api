@@ -1,6 +1,8 @@
 package org.olabs.portal.api;
 
 import java.io.File;
+import javax.servlet.ServletException;
+import org.apache.catalina.LifecycleException;
 import org.apache.catalina.WebResourceRoot;
 import org.apache.catalina.core.StandardContext;
 import org.apache.catalina.startup.Tomcat;
@@ -9,19 +11,35 @@ import org.apache.catalina.webresources.StandardRoot;
 import org.objectlabs.ws.ResourceException;
 
 public class Main {
+  private static final String CONFIG_ENV_VAR = "MLAB_DATA_API_CONFIG";
+  private static final String API_KEY_ENV_VAR = "MLAB_DATA_API_KEY";
   private static final String WEB_APP_DIR = "www";
   private static final String WEB_APP_PATH = "/api/1";
 
+  private static Tomcat _tomcat = null;
+
   public static void main(String[] args) throws Exception {
-    final Tomcat tomcat = new Tomcat();
+    System.setProperty(ApiConfig.CONFIG_PROPERTY, System.getenv(CONFIG_ENV_VAR));
+    System.setProperty(ApiConfig.API_KEY_PROPERTY, System.getenv(API_KEY_ENV_VAR));
+    System.setProperty(ApiConfig.APP_DIR_PROPERTY, WEB_APP_DIR);
+    start(ApiConfig.getInstance().getPort());
+    _tomcat.getServer().await();
+  }
+
+  public static void start(final int pPort) throws LifecycleException, ServletException {
+    if (_tomcat != null) {
+      return;
+    }
+    _tomcat = new Tomcat();
     try {
-      tomcat.setPort(ApiConfig.getInstance().getPort());
+      _tomcat.setPort(pPort);
     } catch (final ResourceException e) {
       System.out.println(String.format("Error getting config: %s", e.getMessage()));
       System.exit(1);
     }
+    final String webAppDir = System.getProperty(ApiConfig.APP_DIR_PROPERTY);
     final StandardContext ctx =
-        (StandardContext) tomcat.addWebapp(WEB_APP_PATH, new File(WEB_APP_DIR).getAbsolutePath());
+        (StandardContext) _tomcat.addWebapp(WEB_APP_PATH, new File(webAppDir).getAbsolutePath());
     final WebResourceRoot resources = new StandardRoot(ctx);
     final File additionWebInfClasses = new File("target/classes");
     if (additionWebInfClasses.isDirectory() && additionWebInfClasses.exists()) {
@@ -31,7 +49,10 @@ public class Main {
     }
     ctx.setResources(resources);
     System.out.println("Starting mLab Data API...");
-    tomcat.start();
-    tomcat.getServer().await();
+    _tomcat.start();
+  }
+
+  public static void stop() throws LifecycleException {
+    _tomcat.stop();
   }
 }
