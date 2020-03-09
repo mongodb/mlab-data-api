@@ -41,7 +41,6 @@ public class DatabaseResource extends PortalRESTResource {
     result.add("collections");
     result.add("commands");
     result.add("runCommand");
-    result.add("status");
     return (result);
   }
 
