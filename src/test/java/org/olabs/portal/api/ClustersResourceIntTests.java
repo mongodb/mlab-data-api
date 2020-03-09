@@ -13,7 +13,7 @@ public class ClustersResourceIntTests extends BaseResourceTest {
   public void testGet() throws IOException {
     final JSONArray clusters = client.getJsonArray("clusters");
     assertNotNull(clusters);
-    assertTrue(clusters.toList().contains("rs-ds113926"));
-    assertTrue(clusters.toList().contains("rs-ds253357"));
+    assertTrue(clusters.toList().contains(DEDICATED_CLUSTER_ID));
+    assertTrue(clusters.toList().contains(SHARED_CLUSTER_ID));
   }
 }

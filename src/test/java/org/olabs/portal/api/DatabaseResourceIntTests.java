@@ -13,7 +13,7 @@ public class DatabaseResourceIntTests extends BaseResourceTest {
     final List<String> expectedChildren = List.of("collections", "commands", "runCommand");
     assertTrue(
         client
-            .getJsonArray("clusters/rs-ds113926/databases/test")
+            .getJsonArray(String.format("clusters/%s/databases/test", DEDICATED_CLUSTER_ID))
             .toList()
             .containsAll(expectedChildren));
   }

@@ -24,7 +24,9 @@ public class MongoDBConnectionResourceIntTests extends BaseResourceTest {
     TEST_CASES.forEach(
         (urlParams, expectedDbs) -> {
           try {
-            final JSONArray dbs = client.getJsonArray("clusters/rs-ds113926/databases" + urlParams);
+            final JSONArray dbs =
+                client.getJsonArray(
+                    String.format("clusters/%s/databases%s", DEDICATED_CLUSTER_ID, urlParams));
             assertNotNull(dbs);
             assertEquals(expectedDbs.size(), dbs.length());
             assertTrue(expectedDbs.containsAll(dbs.toList()));

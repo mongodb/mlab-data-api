@@ -47,11 +47,12 @@ public class DatabaseResource extends PortalRESTResource {
   public Resource resolveRelative(Uri uri) {
 
     Resource r = null;
-
-    /*
     String head = uri.getHead();
     if (head.equals("collections")) {
       r = new DBCollectionsResource(getDatabase());
+    }
+
+    /*
     } else if (head.equals("commands")) {
       r = new CommandsResource(getDatabase());
     } else if (head.equals("runCommand")) {

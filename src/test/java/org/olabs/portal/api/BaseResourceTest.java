@@ -9,6 +9,10 @@ import org.junit.runners.Parameterized.Parameters;
 
 @RunWith(Parameterized.class)
 public abstract class BaseResourceTest {
+
+  public static final String DEDICATED_CLUSTER_ID = "rs-ds113926";
+  public static final String SHARED_CLUSTER_ID = "rs-ds253357";
+
   private static final String TEST_CONFIG_ENV_VAR = "MLAB_DATA_API_TEST_CONFIG";
   private static final String TEST_PROD_API_KEY_ENV_VAR = "MLAB_DATA_API_TEST_PROD_KEY";
   private static final String TEST_API_KEY = "PggfZYDE6EWh2FCLsvGm42cq";
