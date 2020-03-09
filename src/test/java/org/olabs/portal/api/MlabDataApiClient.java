@@ -20,14 +20,20 @@ import org.json.JSONObject;
 import org.objectlabs.ws.ResourceException;
 
 public class MlabDataApiClient {
+  private final String _name;
   private final String _host;
   private final CloseableHttpClient _client;
   private final String _apiKey;
 
-  public MlabDataApiClient(final String pHost, final String pApiKey) {
+  public MlabDataApiClient(final String pName, final String pHost, final String pApiKey) {
+    _name = pName;
     _client = HttpClients.createMinimal();
     _host = pHost;
     _apiKey = pApiKey;
+  }
+
+  public String getName() {
+    return _name;
   }
 
   public String get(final String pPath) throws IOException {
@@ -46,6 +52,10 @@ public class MlabDataApiClient {
 
   public JSONArray getJsonArray(final String pPath) throws IOException {
     return new JSONArray(get(pPath));
+  }
+
+  public String toString() {
+    return getName();
   }
 
   private String getPathUrl(final String pPath) throws MalformedURLException, UnsupportedEncodingException {
