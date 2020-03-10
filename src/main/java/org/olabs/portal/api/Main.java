@@ -19,11 +19,20 @@ public class Main {
   private static Tomcat _tomcat = null;
 
   public static void main(String[] args) throws Exception {
-    System.setProperty(ApiConfig.CONFIG_PROPERTY, System.getenv(CONFIG_ENV_VAR));
-    System.setProperty(ApiConfig.API_KEY_PROPERTY, System.getenv(API_KEY_ENV_VAR));
+    readEnvToProp(CONFIG_ENV_VAR, ApiConfig.CONFIG_PROPERTY);
+    readEnvToProp(API_KEY_ENV_VAR, ApiConfig.API_KEY_PROPERTY);
     System.setProperty(ApiConfig.APP_DIR_PROPERTY, WEB_APP_DIR);
     start();
     _tomcat.getServer().await();
+  }
+
+  private static void readEnvToProp(final String env, final String prop) {
+    final String value = System.getenv(env);
+    if(value == null) {
+      System.out.println(String.format("%s environment variable is required", env));
+      System.exit(1);
+    }
+    System.setProperty(prop, value);
   }
 
   public static void start() throws LifecycleException, ServletException {
