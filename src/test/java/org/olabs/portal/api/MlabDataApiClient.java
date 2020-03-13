@@ -71,7 +71,7 @@ public class MlabDataApiClient {
 
   public String doRequestString(final HttpUriRequest pRequest) throws IOException {
     final HttpResponse response = doRequest(pRequest);
-    final int status = doRequest(pRequest).getStatusLine().getStatusCode();
+    final int status = response.getStatusLine().getStatusCode();
     if (status == HttpStatus.SC_OK) {
       return EntityUtils.toString(response.getEntity());
     } else {
