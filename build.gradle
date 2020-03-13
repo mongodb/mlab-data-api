@@ -52,6 +52,6 @@ dependencies {
     compile 'org.slf4j:jul-to-slf4j:1.7.30'
     compile 'org.slf4j:log4j-over-slf4j:1.7.30'
     compile 'org.slf4j:slf4j-api:1.7.30'
-    testImplementation 'junit:junit:4.12'
-    testImplementation 'org.mockito:mockito-core:2.28.2'
+    compile 'junit:junit:4.12'
+    compile 'org.mockito:mockito-core:2.28.2'
 }
