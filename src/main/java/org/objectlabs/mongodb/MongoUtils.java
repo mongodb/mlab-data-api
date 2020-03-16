@@ -1,11 +1,16 @@
 package org.objectlabs.mongodb;
 
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.UUID;
+import org.bson.types.ObjectId;
 
 public class MongoUtils {
 
@@ -54,4 +59,71 @@ public class MongoUtils {
       return names;
     }
   }
+
+  public static DBObject findOne(MongoCollection collection, BasicDBObject query) {
+    final MongoCursor cursor = collection.find(query).limit(1).iterator();
+    return cursor.hasNext() ? (DBObject) cursor.next() : null;
+  }
+
+  public static DBObject findOneById(MongoCollection collection, Object id) {
+    return findOne(collection, new BasicDBObject("_id", id));
+  }
+
+  public static DBObject findOneByStringId(MongoCollection collection, String docid) {
+    Object id;
+    try {
+      id = new ObjectId(docid);
+    } catch (IllegalArgumentException e) {
+      id = docid;
+    }
+    DBObject doc = findOneById(collection, id);
+    if (doc == null) {
+      // maybe they're using the oid string as a literal id?
+      doc = findOneById(collection, docid);
+    }
+    if (doc == null) {
+      // maybe the id is supposed to be a number?
+      try {
+        doc = findOneById(collection, Long.valueOf(docid));
+      } catch (NumberFormatException e) {
+        // nope, guess not
+        // how bout a double?
+        try {
+          doc = findOneById(collection, Double.valueOf(docid));
+        } catch (NumberFormatException f) {
+          // bah, fine, I give up
+        }
+      }
+    }
+    if (doc == null) {
+      // maybe it's a UUID?
+      try {
+        doc = findOneById(collection, UUID.fromString(docid));
+      } catch (IllegalArgumentException e) {
+        // guess not
+      }
+    }
+    return doc;
+  }
+
+  public static boolean isDatabaseReadOnly(MongoDatabase db) {
+    return isDatabaseReadOnly(db.getName());
+  }
+
+  public static boolean isDatabaseReadOnly(String dbName) {
+    return READ_ONLY_DB_NAMES.contains(dbName);
+  }
+
+  public static boolean isCollectionReadOnly(MongoCollection c) {
+    return isCollectionReadOnly(c.getNamespace().getDatabaseName(), c.getNamespace().getCollectionName());
+  }
+
+  public static boolean isCollectionReadOnly(MongoDatabase db, String collection) {
+    return isCollectionReadOnly(db.getName(), collection);
+  }
+
+  public static boolean isCollectionReadOnly(String dbName, String collection) {
+    return isDatabaseReadOnly(dbName) || READ_ONLY_COLLECTION_NAMES.contains(collection) || collection.startsWith("objectlabs-system.");
+  }
+
 }
