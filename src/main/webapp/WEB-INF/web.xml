@@ -16,8 +16,17 @@
     </filter>
     <filter-mapping>
         <filter-name>ApiKeyFilter</filter-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/api/1/*</url-pattern>
     </filter-mapping>
+
+    <servlet>
+        <servlet-name>Status</servlet-name>
+        <servlet-class>org.olabs.portal.api.StatusServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>Status</servlet-name>
+        <url-pattern>/</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>Api</servlet-name>
@@ -25,11 +34,11 @@
     </servlet>
     <servlet-mapping>
         <servlet-name>Api</servlet-name>
-        <url-pattern>/</url-pattern>
+        <url-pattern>/api/1</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>Api</servlet-name>
-        <url-pattern>/*</url-pattern>
+        <url-pattern>/api/1/*</url-pattern>
     </servlet-mapping>
 
 </web-app>

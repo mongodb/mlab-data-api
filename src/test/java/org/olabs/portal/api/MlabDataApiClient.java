@@ -5,8 +5,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -36,14 +36,18 @@ public class MlabDataApiClient {
     return _name;
   }
 
+  public String getHost() {
+    return _host;
+  }
+
   public String get(final String pPath) throws IOException {
-    return doRequest(new HttpGet(getPathUrl(pPath)));
+    return doRequestString(new HttpGet(getPathUrl(pPath)));
   }
 
   public String post(final String pPath, final JSONObject pData) throws IOException {
     final HttpPost post = new HttpPost(getPathUrl(pPath));
     post.setEntity(new StringEntity(pData.toString(), ContentType.APPLICATION_JSON));
-    return doRequest(post);
+    return doRequestString(post);
   }
 
   public JSONObject getJson(final String pPath) throws IOException {
@@ -59,19 +63,23 @@ public class MlabDataApiClient {
   }
 
   private String getPathUrl(final String pPath) throws MalformedURLException, UnsupportedEncodingException {
-    final URL url = new URL(String.format("%s/api/1/%s", _host, pPath));
+    final URL url = new URL(String.format("%s/api/1/%s", getHost(), pPath));
     final String delim = url.getQuery() == null || url.getQuery().isEmpty() ? "?" : "&";
     return String.format(
         "%s%sapiKey=%s", url.toString(), delim, URLEncoder.encode(_apiKey, "UTF-8"));
   }
 
-  private String doRequest(final HttpUriRequest pRequest) throws IOException {
-    final CloseableHttpResponse response = _client.execute(pRequest);
+  public String doRequestString(final HttpUriRequest pRequest) throws IOException {
+    final HttpResponse response = doRequest(pRequest);
     final int status = response.getStatusLine().getStatusCode();
     if (status == HttpStatus.SC_OK) {
       return EntityUtils.toString(response.getEntity());
     } else {
       throw new ResourceException(status);
     }
+  }
+
+  public HttpResponse doRequest(final HttpUriRequest pRequest) throws IOException {
+    return _client.execute(pRequest);
   }
 }

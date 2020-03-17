@@ -14,7 +14,7 @@ public class Main {
   private static final String CONFIG_ENV_VAR = "MLAB_DATA_API_CONFIG";
   private static final String API_KEY_ENV_VAR = "MLAB_DATA_API_KEY";
   private static final String WEB_APP_DIR = "www";
-  private static final String WEB_APP_PATH = "/api/1";
+  private static final String WEB_APP_PATH = "";
 
   private static Tomcat _tomcat = null;
 
