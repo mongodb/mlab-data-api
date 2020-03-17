@@ -233,6 +233,29 @@ public class CollectionResourceIntTests extends BaseResourceTest {
     assertEquals("1", ((JSONObject) results.get(1)).get("variable"));
   }
 
+  @Test
+  public void testGet_limit() throws IOException {
+    final JSONArray results =
+        client.getJsonArray(
+            getCollectionUrl(TEST_COLLECTION)
+                .query("l", 2)
+                .query("s", "{\"variable\": -1}")
+                .toString());
+    assertEquals(2, results.length());
+    assertEquals("3", ((JSONObject) results.get(0)).get("variable"));
+    assertEquals("2", ((JSONObject) results.get(1)).get("variable"));
+
+    final JSONArray results2 =
+        client.getJsonArray(
+            getCollectionUrl(TEST_COLLECTION)
+                .query("sk", 1)
+                .query("l", 1)
+                .query("s", "{\"variable\": 1}")
+                .toString());
+    assertEquals(1, results2.length());
+    assertEquals("2", ((JSONObject) results2.get(0)).get("variable"));
+  }
+
   private ApiPathBuilder getCollectionUrl(final String collection) {
     return ApiPathBuilder.start().cluster(DEDICATED_CLUSTER_ID).db(TEST_DB).collection(collection);
   }
