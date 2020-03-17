@@ -17,7 +17,6 @@ public class DBCollectionsResourceIntTests extends BaseResourceTest {
         client.getJsonArray(
             String.format("clusters/%s/databases/test/collections", DEDICATED_CLUSTER_ID));
     assertNotNull(collections);
-    assertEquals(5, collections.length());
     assertTrue(collections.toList().contains("c1"));
     assertTrue(collections.toList().contains("c2"));
     assertTrue(collections.toList().contains("c3"));

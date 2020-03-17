@@ -140,4 +140,8 @@ public class MongoUtils {
   public static String toISODateString(Date date) {
     return ISO_DATE_FORMAT.format(date);
   }
+
+  public static ObjectId oid(final Integer pId) {
+    return new ObjectId(String.format("%024d", pId));
+  }
 }

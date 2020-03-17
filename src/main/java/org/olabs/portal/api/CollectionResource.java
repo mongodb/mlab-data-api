@@ -8,6 +8,7 @@ import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcernException;
 import com.mongodb.client.MongoCollection;
+import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -294,13 +295,13 @@ public class CollectionResource extends PortalRESTResource {
 
   public Resource resolveRelative(final Uri uri) {
     /*
-    final String id = uri.toString();
-    final Object o = MongoUtils.findOneByStringId(getCollection(), id);
-    final Resource result = new ObjectResource(o);
-    result.setName(id);
-    result.setParent(this);
-    return result;
-   */
+     final String id = uri.toString();
+     final Object o = MongoUtils.findOneByStringId(getCollection(), id);
+     final Resource result = new ObjectResource(o);
+     result.setName(id);
+     result.setParent(this);
+     return result;
+    */
 
     return null;
   }
@@ -433,21 +434,23 @@ public class CollectionResource extends PortalRESTResource {
                 .projection(fields)
                 .sort(sortOrder)
                 .limit(1)
+                .map(o -> new BasicDBObject((Document) o))
                 .into(new ArrayList());
         if (count) {
           return result.size();
         }
         return result.isEmpty() ? null : result.iterator().next();
+      } else if (count) {
+        return collection.countDocuments(query, new CountOptions().skip(skip).limit(limit));
       } else {
-        final Collection results =
-            collection
-                .find(query)
-                .sort(sortOrder)
-                .projection(fields)
-                .skip(skip)
-                .limit(limit)
-                .into(new ArrayList());
-        return count ? results.size() : results;
+        return collection
+            .find(query)
+            .sort(sortOrder)
+            .projection(fields)
+            .skip(skip)
+            .limit(limit)
+            .map(o -> new BasicDBObject((Document) o))
+            .into(new ArrayList());
       }
     } catch (final MongoException e) {
       // TODO: String matching is very dangerous.
