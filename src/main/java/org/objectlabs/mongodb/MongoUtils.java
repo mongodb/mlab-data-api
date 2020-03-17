@@ -5,10 +5,14 @@ import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.UUID;
 import org.bson.types.ObjectId;
 
@@ -126,4 +130,14 @@ public class MongoUtils {
     return isDatabaseReadOnly(dbName) || READ_ONLY_COLLECTION_NAMES.contains(collection) || collection.startsWith("objectlabs-system.");
   }
 
+  private static final SimpleDateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+  static {
+    ISO_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
+  }
+  public static Date parseISODate(String date) throws ParseException {
+    return ISO_DATE_FORMAT.parse(date);
+  }
+  public static String toISODateString(Date date) {
+    return ISO_DATE_FORMAT.format(date);
+  }
 }
