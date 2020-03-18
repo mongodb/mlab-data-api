@@ -196,7 +196,7 @@ public class CollectionResource extends PortalRESTResource {
     Object result = null;
     final RequestContext context = makeRequestContext(request, response);
     if (object instanceof List) {
-      result = handlePutList((List) object, context);
+      result = handlePutList((List<DBObject>) object, context);
     } else if (object instanceof DBObject) {
       result = handlePutObject((BasicDBObject) object, context);
     } else if (object != null) {
@@ -252,7 +252,7 @@ public class CollectionResource extends PortalRESTResource {
     }
   }
 
-  private Object handlePutList(final List<Document> objects, final RequestContext context)
+  private Object handlePutList(final List<DBObject> objects, final RequestContext context)
       throws ResourceException {
     try {
       final MongoCollection c = getCollection();
@@ -269,7 +269,8 @@ public class CollectionResource extends PortalRESTResource {
 
       // insert all objects
       if (objects != null && !objects.isEmpty()) {
-        c.insertMany(objects);
+        c.insertMany(
+            objects.stream().map(o -> new Document(o.toMap())).collect(Collectors.toList()));
       }
 
       final DBObject result = new BasicDBObject();
@@ -482,7 +483,11 @@ public class CollectionResource extends PortalRESTResource {
 
   private DBObject updateResultToDBObject(final UpdateResult ur) {
     final DBObject result = new BasicDBObject();
-    result.put("n", ur.getModifiedCount());
+    if (ur.getUpsertedId() != null) {
+      result.put("n", 1);
+    } else {
+      result.put("n", ur.getModifiedCount());
+    }
     return result;
   }
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
@@ -461,6 +462,104 @@ public class CollectionResourceIntTests extends BaseResourceTest {
               ((JSONObject) ((JSONObject) u).get("date")).get("$date"));
           assertEquals("new", ((JSONObject) u).get("newField"));
         });
+  }
+
+  @Test
+  public void testPut_upsert() throws IOException {
+    final String variable = client.getName() + "put_upsert";
+    final BasicDBObject update =
+        new BasicDBObject("$set", new BasicDBObject("date", new Date(0)).append("newField", "new"));
+    final JSONObject putResult =
+        client.putJson(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", variable).toJson())
+                .query("u", "true")
+                .toString(),
+            JSON_PARSER.serialize(update));
+    assertEquals(1, putResult.getInt("n"));
+    // verify that a new document was created
+    final JSONObject upserted =
+        client.getJson(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", variable).toJson())
+                .query("fo", "true")
+                .toString());
+    assertNotNull(upserted);
+    assertEquals(toISODateString(new Date(0)), ((JSONObject) upserted.get("date")).get("$date"));
+    assertEquals("new", upserted.get("newField"));
+  }
+
+  @Test
+  public void testPut_replaceList() throws IOException {
+    final String variable = client.getName() + "put_replaceList";
+    final List<DBObject> docs =
+        List.of(
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)));
+    // add documents
+    client.postJson(getCollectionUrl(TEST_POST_COLLECTION).toString(), JSON_PARSER.serialize(docs));
+    // update them all
+    final String replacementVariable = client.getName() + "put_replaceList_replacement";
+    final List<DBObject> replacements =
+        List.of(
+            new BasicDBObject(makeTestMap(replacementVariable)),
+            new BasicDBObject(makeTestMap(replacementVariable)),
+            new BasicDBObject(makeTestMap(replacementVariable)));
+    final JSONObject putResult =
+        client.putJson(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", variable).toJson())
+                .toString(),
+            JSON_PARSER.serialize(replacements));
+    assertEquals(3, putResult.getInt("n"));
+    assertEquals(5, putResult.getInt("removed"));
+    // verify that old documents were removed
+    assertNull(
+        client.getJson(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", variable).toJson())
+                .query("fo", "true")
+                .toString()));
+    // verify that new documents were added
+    final JSONArray replaced =
+        client.getJsonArray(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", replacementVariable).toJson())
+                .toString());
+    assertEquals(3, replaced.length());
+  }
+
+  @Test
+  public void testPut_remove() throws IOException {
+    final String variable = client.getName() + "put_remove";
+    final List<DBObject> docs =
+        List.of(
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)),
+            new BasicDBObject(makeTestMap(variable)));
+    // add documents
+    client.postJson(getCollectionUrl(TEST_POST_COLLECTION).toString(), JSON_PARSER.serialize(docs));
+    // remove them all
+    final JSONObject putResult =
+        client.putJson(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", variable).toJson())
+                .toString(),
+            "[]");
+    assertEquals(0, putResult.getInt("n"));
+    assertEquals(5, putResult.getInt("removed"));
+    // verify that old documents were removed
+    assertNull(
+        client.getJson(
+            getCollectionUrl(TEST_POST_COLLECTION)
+                .query("q", new BasicDBObject("variable", variable).toJson())
+                .query("fo", "true")
+                .toString()));
   }
 
   private ApiPathBuilder getCollectionUrl(final String collection) {
