@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.bson.BSONObject;
@@ -114,7 +115,7 @@ public class CollectionResource extends PortalRESTResource {
     BasicDBObject result = null;
     final RequestContext context = makeRequestContext(request, response);
     if (object instanceof List) {
-      result = handlePostList((List) object, context);
+      result = handlePostList((List<DBObject>) object, context);
     } else if (object instanceof DBObject) {
       result = handlePostObject((BasicDBObject) object, context);
     } else if (object != null) {
@@ -156,11 +157,13 @@ public class CollectionResource extends PortalRESTResource {
     return object;
   }
 
-  private BasicDBObject handlePostList(final List<Document> objects, final RequestContext context)
+  private BasicDBObject handlePostList(final List<DBObject> objects, final RequestContext context)
       throws ResourceException {
     if (objects != null) {
       try {
-        getCollection().insertMany(objects);
+        getCollection()
+            .insertMany(
+                objects.stream().map(o -> new Document(o.toMap())).collect(Collectors.toList()));
         return new BasicDBObject("n", objects.size());
       } catch (final IllegalArgumentException e) {
         throw new ResourceException(
@@ -226,27 +229,25 @@ public class CollectionResource extends PortalRESTResource {
       final boolean multi = getMulti(parameters);
       final boolean upsert = getUpsert(parameters);
       final MongoCollection c = getCollection();
-      final BasicDBObject update = asUpdate(object);
       final UpdateOptions options = new UpdateOptions().upsert(upsert);
 
       validateQuery(query);
       if (multi) {
-        return updateResultToDBObject(c.updateMany(query, update, options));
+        return updateResultToDBObject(c.updateMany(query, object, options));
       } else {
-        return updateResultToDBObject(c.updateOne(query, update, options));
+        return updateResultToDBObject(c.updateOne(query, asUpdate(object), options));
       }
     } catch (final IllegalArgumentException e) {
       throw new ResourceException(
           HttpServletResponse.SC_BAD_REQUEST,
-          "Invalid object " + object + ": " + e.getMessage(),
+          String.format("Invalid object %s: %s", object, e.getMessage()),
           e);
     } catch (final DuplicateKeyException e) {
       throw new ResourceException(
           HttpServletResponse.SC_BAD_REQUEST,
-          "Unique index constraint violated, duplicate key found trying to update object "
-              + object
-              + ": "
-              + e.getMessage(),
+          String.format(
+              "Unique index constraint violated, duplicate key found trying to update object %s: %s",
+              object, e.getMessage()),
           e);
     }
   }

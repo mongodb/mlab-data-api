@@ -296,6 +296,16 @@ public class JsonParser {
         if(o instanceof List) {
             return ((List)o).stream().map(e -> deepMap(e, f)).collect(Collectors.toList());
         }
+        if(o instanceof JSONObject) {
+            final DBObject obj = new BasicDBObject();
+            for(final String key : ((JSONObject) o).keySet()) {
+                obj.put(key, deepMap(((JSONObject) o).get(key), f));
+            }
+            return obj;
+        }
+        if(o instanceof JSONArray) {
+            return ((JSONArray)o).toList().stream().map(e -> deepMap(e, f)).collect(Collectors.toList());
+        }
         return f.apply(o);
     }
 

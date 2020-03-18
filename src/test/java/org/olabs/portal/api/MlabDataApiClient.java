@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -44,18 +45,32 @@ public class MlabDataApiClient {
     return doRequestString(new HttpGet(getPathUrl(pPath)));
   }
 
-  public String post(final String pPath, final JSONObject pData) throws IOException {
-    final HttpPost post = new HttpPost(getPathUrl(pPath));
-    post.setEntity(new StringEntity(pData.toString(), ContentType.APPLICATION_JSON));
-    return doRequestString(post);
-  }
-
   public JSONObject getJson(final String pPath) throws IOException {
     return new JSONObject(get(pPath));
   }
 
   public JSONArray getJsonArray(final String pPath) throws IOException {
     return new JSONArray(get(pPath));
+  }
+
+  public String post(final String pPath, final String pData) throws IOException {
+    final HttpPost post = new HttpPost(getPathUrl(pPath));
+    post.setEntity(new StringEntity(pData, ContentType.APPLICATION_JSON));
+    return doRequestString(post);
+  }
+
+  public JSONObject postJson(final String pPath, final String pData) throws IOException {
+    return new JSONObject(post(pPath, pData));
+  }
+
+  public String put(final String pPath, final String pData) throws IOException {
+    final HttpPut put = new HttpPut(getPathUrl(pPath));
+    put.setEntity(new StringEntity(pData, ContentType.APPLICATION_JSON));
+    return doRequestString(put);
+  }
+
+  public JSONObject putJson(final String pPath, final String pData) throws IOException {
+    return new JSONObject(put(pPath, pData));
   }
 
   public String toString() {
