@@ -7,6 +7,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
@@ -74,6 +75,15 @@ public class MlabDataApiClient {
 
   public JSONObject putJson(final String pPath, final String pData) throws IOException {
     final String result = put(pPath, pData);
+    return result == null ? null : new JSONObject(result);
+  }
+
+  public String delete(final String pPath) throws IOException {
+    return doRequestString(new HttpDelete(getPathUrl(pPath)));
+  }
+
+  public JSONObject deleteJson(final String pPath) throws IOException {
+    final String result = delete(pPath);
     return result == null ? null : new JSONObject(result);
   }
 

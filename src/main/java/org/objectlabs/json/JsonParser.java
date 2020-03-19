@@ -20,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.bson.BSONObject;
 import org.bson.BsonTimestamp;
+import org.bson.Document;
 import org.bson.types.BSONTimestamp;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
@@ -306,6 +307,13 @@ public class JsonParser {
         if(o instanceof JSONArray) {
             return ((JSONArray)o).toList().stream().map(e -> deepMap(e, f)).collect(Collectors.toList());
         }
+        if(o instanceof Document) {
+            final DBObject obj = new BasicDBObject();
+            for(final String key : ((Document) o).keySet()) {
+                obj.put(key, deepMap(((Document) o).get(key), f));
+            }
+            return obj;
+        }
         return f.apply(o);
     }
 
@@ -362,6 +370,10 @@ public class JsonParser {
         } else {
             w.write(serialize(o));
         }
+    }
+
+    public Object jsonify(final Object o) {
+        return parse(serialize(o));
     }
 
     public static String prettyPrint(Object o, int indentFactor) {
