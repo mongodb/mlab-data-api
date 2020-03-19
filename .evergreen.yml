@@ -3,9 +3,16 @@ functions:
     - command: git.get_project
       params:
         directory: src
-    - command: subprocess.exec
-      params:
-        working_dir: src
-        binary: gradlew
-        args:
-          - install
+
+tasks:
+- name: compile
+  commands:
+    - func: build
+
+buildvariants:
+  - name: main
+    display_name: main
+    run_on:
+      - rhel70-small
+    tasks:
+      - compile
