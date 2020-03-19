@@ -16,7 +16,11 @@ import java.io.Writer;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.bson.BSONObject;
+import org.bson.BsonTimestamp;
+import org.bson.types.BSONTimestamp;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
@@ -278,37 +282,60 @@ public class JsonParser {
         return constructedBinaryDataExtendedJson;
     }
 
-    public static void convertBinaryTypesToJson(DBObject obj) {
-        for(String key : obj.keySet()) {
-            if (obj.get(key) instanceof DBObject) {
-                convertBinaryTypesToJson((DBObject) obj.get(key));
-            }
-            if (obj.get(key) instanceof byte[]) {
-                obj.put(key, constructExtendedJsonFromBinary((byte[])obj.get(key)));
-            }
-            if (obj.get(key) instanceof Binary){
-                obj.put(key, constructExtendedJsonFromBinary(((Binary) obj.get(key)).getType(), ((Binary) obj.get(key)).getData()));
-            }
+    private static Object deepMap(final Object o, final Function<Object, Object> f) {
+        if(o == null) {
+            return null;
         }
+        if(o instanceof DBObject) {
+            final DBObject obj = (DBObject)o;
+            for(final String key : obj.keySet()) {
+                obj.put(key, deepMap(obj.get(key), f));
+            }
+            return obj;
+        }
+        if(o instanceof List) {
+            return ((List)o).stream().map(e -> deepMap(e, f)).collect(Collectors.toList());
+        }
+        if(o instanceof JSONObject) {
+            final DBObject obj = new BasicDBObject();
+            for(final String key : ((JSONObject) o).keySet()) {
+                obj.put(key, deepMap(((JSONObject) o).get(key), f));
+            }
+            return obj;
+        }
+        if(o instanceof JSONArray) {
+            return ((JSONArray)o).toList().stream().map(e -> deepMap(e, f)).collect(Collectors.toList());
+        }
+        return f.apply(o);
     }
 
-    public String serialize(Object o) {
-        /**
-         * JSON.serialize is deprecated, and does not output valid JSON for
-         * binary data.
-         *
-         * The superseding BasicDBObject.toJson() method will break
-         * other serialization dependencies throughout the portal due to
-         * different serializations in some cases.
-         *
-         * As an interim fix, before serializing, convert binary types to valid JSON,
-         * so that the serializer does not serialize to <Binary Data>, and preserves
-         * serializations for other extended JSON types.
-         */
-        if (o instanceof DBObject) {
-            convertBinaryTypesToJson((DBObject) o);
-        }
-        return(JSON.serialize(o));
+    public static Object convertBinaryTypesToJson(final Object o) {
+        return deepMap(o, v -> {
+            if(v instanceof byte[]) {
+                return constructExtendedJsonFromBinary((byte[])v);
+            }
+            if(v instanceof Binary) {
+                final Binary b = (Binary)v;
+                return constructExtendedJsonFromBinary(b.getType(), b.getData());
+            }
+            return v;
+        });
+    }
+
+    public static Object convertTimestamps(final Object o) {
+        return deepMap(o, v -> {
+            if(v instanceof BsonTimestamp) {
+                final BsonTimestamp t = (BsonTimestamp)v;
+                return new BSONTimestamp(t.getTime(), t.getInc());
+            }
+            return v;
+        });
+    }
+
+    public String serialize(final Object o) {
+        return JSON.serialize(
+            convertTimestamps(
+                convertBinaryTypesToJson(o)));
     }
 
     public void serialize(Object o, Writer w) throws IOException {

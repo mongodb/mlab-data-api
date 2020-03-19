@@ -1,7 +1,7 @@
 package org.objectlabs.ns;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -110,11 +110,7 @@ public class Path {
             if (pathList != null) {
                 for (String elem : pathList) {
                     if (elem != null) {
-                        try {
-                            result.add(URLDecoder.decode(elem, "UTF-8"));
-                        } catch (UnsupportedEncodingException e) {
-                            // what?! how?
-                        }
+                        result.add(URLDecoder.decode(elem, StandardCharsets.UTF_8));
                     }
                 }
             }
