@@ -1,0 +1,18 @@
+functions:
+  build:
+    - command: git.get_project
+      params:
+        directory: src
+
+tasks:
+- name: compile
+  commands:
+    - func: build
+
+buildvariants:
+- name: main
+  display_name: main
+  run_on:
+    - rhel70-small
+  tasks:
+    - compile
