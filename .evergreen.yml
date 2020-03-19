@@ -1,0 +1,9 @@
+functions:
+  build:
+    - command: git.get_project
+      params:
+        directory: src
+    - command: shell.exec
+      params:
+        working_dir: src
+        script: ./gradlew install
