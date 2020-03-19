@@ -10,9 +10,9 @@ tasks:
     - func: build
 
 buildvariants:
-  - name: main
-    display_name: main
-    run_on:
-      - rhel70-small
-    tasks:
-      - compile
+- name: main
+  display_name: main
+  run_on:
+    - rhel70-small
+  tasks:
+    - compile
