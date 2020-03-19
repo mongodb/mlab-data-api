@@ -3,7 +3,9 @@ functions:
     - command: git.get_project
       params:
         directory: src
-    - command: shell.exec
+    - command: subprocess.exec
       params:
         working_dir: src
-        script: ./gradlew install
+        binary: gradlew
+        args:
+          - install
