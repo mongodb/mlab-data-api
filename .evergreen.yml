@@ -1,3 +1,4 @@
+# test
 functions:
   build:
     - command: git.get_project
