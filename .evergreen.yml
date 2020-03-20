@@ -11,11 +11,26 @@ functions:
         binary: ./gradlew
         args:
           - install
+  "run tests":
+    - command: subprocess.exec
+      params:
+        working_dir: src
+        env:
+          JAVA_HOME: /opt/java/jdk11
+          MLAB_DATA_API_TEST_PROD_KEY: ${MLAB_DATA_API_TEST_PROD_KEY}
+          MLAB_DATA_API_TEST_CONFIG: ${MLAB_DATA_API_TEST_CONFIG}
+        binary: ./gradlew
+        args:
+          - :cleanTest
+          - :test
 
 tasks:
 - name: compile
   commands:
     - func: build
+- name: test
+  commands:
+    - func: run tests
 
 buildvariants:
 - name: main
@@ -24,3 +39,4 @@ buildvariants:
     - rhel70-small
   tasks:
     - compile
+    - test
