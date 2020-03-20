@@ -1,17 +1,8 @@
 functions:
-  build:
+  "run tests":
     - command: git.get_project
       params:
         directory: src
-    - command: subprocess.exec
-      params:
-        working_dir: src
-        env:
-          JAVA_HOME: /opt/java/jdk11
-        binary: ./gradlew
-        args:
-          - install
-  "run tests":
     - command: subprocess.exec
       params:
         working_dir: src
@@ -21,16 +12,10 @@ functions:
           MLAB_DATA_API_TEST_CONFIG: ${MLAB_DATA_API_TEST_CONFIG}
         binary: ./gradlew
         args:
-          - :cleanTest
-          - :test
+          - build :cleanTest :test
 
 tasks:
-- name: compile
-  commands:
-    - func: build
 - name: test
-  depends_on:
-    - name: compile
   commands:
     - func: run tests
 
@@ -40,5 +25,4 @@ buildvariants:
   run_on:
     - rhel70-small
   tasks:
-    - compile
     - test
