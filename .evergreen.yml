@@ -6,6 +6,8 @@ functions:
     - command: subprocess.exec
       params:
         working_dir: src
+        env:
+          JAVA_HOME: /opt/java/jdk11
         binary: ./gradlew
         args:
           - install
