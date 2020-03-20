@@ -29,6 +29,8 @@ tasks:
   commands:
     - func: build
 - name: test
+  depends_on:
+    - name: compile
   commands:
     - func: run tests
 
