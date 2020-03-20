@@ -50,11 +50,11 @@ public class DatabaseResource extends PortalRESTResource {
     String head = uri.getHead();
     if (head.equals("collections")) {
       r = new DBCollectionsResource(getDatabase());
+    } else if (head.equals("commands")) {
+      r = new CommandsResource(getDatabase());
     }
 
     /*
-    } else if (head.equals("commands")) {
-      r = new CommandsResource(getDatabase());
     } else if (head.equals("runCommand")) {
       r = new RunCommandResource(getDatabase());
     } else if (head.equals("status")) {

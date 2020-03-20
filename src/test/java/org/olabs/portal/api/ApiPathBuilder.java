@@ -10,6 +10,7 @@ public class ApiPathBuilder {
   private boolean clusters;
   private boolean databases;
   private boolean collections;
+  private boolean commands;
   private String cluster;
   private String db;
   private String collection;
@@ -57,6 +58,11 @@ public class ApiPathBuilder {
     return this;
   }
 
+  public ApiPathBuilder commands() {
+    setCommands(true);
+    return this;
+  }
+
   public ApiPathBuilder query(final String key, final Object value) {
     query.put(key, value.toString());
     return this;
@@ -89,6 +95,8 @@ public class ApiPathBuilder {
               sb.append("/").append(getObject());
             }
           }
+        } else if(getCommands()) {
+          sb.append("/commands");
         }
       }
     }
@@ -127,6 +135,14 @@ public class ApiPathBuilder {
 
   private void setCollections(final boolean pCollections) {
     collections = pCollections;
+  }
+
+  public boolean getCommands() {
+    return commands;
+  }
+
+  public void setCommands(final boolean pCommands) {
+    commands = pCommands;
   }
 
   private String getCluster() {
