@@ -12,7 +12,9 @@ functions:
           MLAB_DATA_API_TEST_CONFIG: ${MLAB_DATA_API_TEST_CONFIG}
         binary: ./gradlew
         args:
-          - build :cleanTest :test
+          - install
+          - :cleanTest
+          - :test
 
 tasks:
 - name: test
