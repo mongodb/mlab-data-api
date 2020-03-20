@@ -13,8 +13,7 @@ functions:
         binary: ./gradlew
         args:
           - install
-          - :cleanTest
-          - :test
+          - test
 
 tasks:
 - name: test
