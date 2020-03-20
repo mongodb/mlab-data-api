@@ -25,7 +25,6 @@ public class JsonView implements View {
 
         try {
             w = response.getWriter();
-            // You might be tempted to use DBeans.toDatum(), but that does weird things with id -> _id
             jsonParser.serialize(resourceResult, w);
         } catch (Exception e) {
             throw(new WebServiceException(e));

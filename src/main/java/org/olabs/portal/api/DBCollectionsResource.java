@@ -14,7 +14,7 @@ import org.objectlabs.ws.ResourceException;
 
 public class DBCollectionsResource extends PortalRESTResource {
 
-  public DBCollectionsResource(MongoDatabase db) {
+  public DBCollectionsResource(final MongoDatabase db) {
     super();
     setDatabase(db);
   }
@@ -35,12 +35,12 @@ public class DBCollectionsResource extends PortalRESTResource {
     return (database);
   }
 
-  public void setDatabase(MongoDatabase value) {
+  public void setDatabase(final MongoDatabase value) {
     database = value;
   }
 
-  public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
-    Collection<String> sorted =
+  public Object handleGet(final Map parameters, final RequestContext context) throws ResourceException {
+    final Collection<String> sorted =
         new TreeSet<>(
             (s, s2) -> {
               int cmp = s.compareToIgnoreCase(s2);
@@ -49,7 +49,7 @@ public class DBCollectionsResource extends PortalRESTResource {
               }
               return cmp;
             });
-    String type = (String) parameters.get("type");
+    final String type = (String) parameters.get("type");
     if (type != null && type.equals("view")) {
       sorted.addAll(MongoUtils.getViewNames(getDatabase()));
     } else {
@@ -58,26 +58,20 @@ public class DBCollectionsResource extends PortalRESTResource {
       } else if (type.equals("collection")) {
         sorted.addAll(MongoUtils.getNonViewCollectionNames(getDatabase()));
       }
-      String dbName = getDatabase().getName();
+      final String dbName = getDatabase().getName();
       if (dbName.equals("local") || dbName.equals("admin")) {
         sorted.remove("system.users");
       }
     }
     sorted.remove("system.views");
-    BasicDBList result = new BasicDBList();
+    final BasicDBList result = new BasicDBList();
     result.addAll(sorted);
     return result;
   }
 
-  public Resource resolveRelative(Uri uri) {
-    /*
-    String head = uri.getHead();
-    MongoDatabase db = getDatabase();
-    MongoCollection<Document> c = db.getCollection(head);
-    Resource r = new CollectionResource(c);
+  public Resource resolveRelative(final Uri uri) {
+    final Resource r = new CollectionResource(getDatabase().getCollection(uri.getHead()));
     r.setParent(this);
     return(r.resolve(uri.getTail()));
-    */
-    return null;
   }
 }

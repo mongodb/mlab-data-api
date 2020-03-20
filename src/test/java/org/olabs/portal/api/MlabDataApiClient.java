@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
@@ -44,18 +45,36 @@ public class MlabDataApiClient {
     return doRequestString(new HttpGet(getPathUrl(pPath)));
   }
 
-  public String post(final String pPath, final JSONObject pData) throws IOException {
-    final HttpPost post = new HttpPost(getPathUrl(pPath));
-    post.setEntity(new StringEntity(pData.toString(), ContentType.APPLICATION_JSON));
-    return doRequestString(post);
-  }
-
   public JSONObject getJson(final String pPath) throws IOException {
-    return new JSONObject(get(pPath));
+    final String result = get(pPath);
+    return result == null ? null : new JSONObject(result);
   }
 
   public JSONArray getJsonArray(final String pPath) throws IOException {
-    return new JSONArray(get(pPath));
+    final String result = get(pPath);
+    return result == null ? null : new JSONArray(result);
+  }
+
+  public String post(final String pPath, final String pData) throws IOException {
+    final HttpPost post = new HttpPost(getPathUrl(pPath));
+    post.setEntity(new StringEntity(pData, ContentType.APPLICATION_JSON));
+    return doRequestString(post);
+  }
+
+  public JSONObject postJson(final String pPath, final String pData) throws IOException {
+    final String result = post(pPath, pData);
+    return result == null ? null : new JSONObject(result);
+  }
+
+  public String put(final String pPath, final String pData) throws IOException {
+    final HttpPut put = new HttpPut(getPathUrl(pPath));
+    put.setEntity(new StringEntity(pData, ContentType.APPLICATION_JSON));
+    return doRequestString(put);
+  }
+
+  public JSONObject putJson(final String pPath, final String pData) throws IOException {
+    final String result = put(pPath, pData);
+    return result == null ? null : new JSONObject(result);
   }
 
   public String toString() {
@@ -73,7 +92,15 @@ public class MlabDataApiClient {
     final HttpResponse response = doRequest(pRequest);
     final int status = response.getStatusLine().getStatusCode();
     if (status == HttpStatus.SC_OK) {
-      return EntityUtils.toString(response.getEntity());
+      final String s = EntityUtils.toString(response.getEntity());
+      if(s == null) {
+        return null;
+      }
+      final String trimmed = s.trim();
+      if(trimmed.equals("null")) {
+        return null;
+      }
+      return trimmed;
     } else {
       throw new ResourceException(status);
     }
