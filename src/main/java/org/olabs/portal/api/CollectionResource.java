@@ -71,7 +71,7 @@ public class CollectionResource extends PortalRESTResource {
 
   private MongoCollection<Document> collection;
 
-  private MongoCollection<Document> getCollection() {
+  public MongoCollection<Document> getCollection() {
     return collection;
   }
 
@@ -296,16 +296,12 @@ public class CollectionResource extends PortalRESTResource {
   }
 
   public Resource resolveRelative(final Uri uri) {
-    /*
-     final String id = uri.toString();
-     final Object o = MongoUtils.findOneByStringId(getCollection(), id);
-     final Resource result = new ObjectResource(o);
-     result.setName(id);
-     result.setParent(this);
-     return result;
-    */
-
-    return null;
+    final String id = uri.toString();
+    final DBObject o = MongoUtils.findOneByStringId(getCollection(), id);
+    final Resource result = new ObjectResource(o);
+    result.setName(id);
+    result.setParent(this);
+    return result;
   }
 
   private BasicDBObject getQuery(final Map params) throws ResourceException {
