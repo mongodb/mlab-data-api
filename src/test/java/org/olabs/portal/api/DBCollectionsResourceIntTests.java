@@ -32,6 +32,9 @@ public class DBCollectionsResourceIntTests extends BaseResourceTest {
     assertNotNull(collections);
     assertEquals(1, collections.length());
     assertTrue(collections.toList().contains("view1"));
+    assertFalse(collections.toList().contains("c1"));
+    assertFalse(collections.toList().contains("c2"));
+    assertFalse(collections.toList().contains("c3"));
   }
 
   @Test
@@ -40,11 +43,10 @@ public class DBCollectionsResourceIntTests extends BaseResourceTest {
         client.getJsonArray(
             String.format("clusters/%s/databases/test/collections?type=collection", DEDICATED_CLUSTER_ID));
     assertNotNull(collections);
-    assertEquals(4, collections.length());
     assertTrue(collections.toList().contains("c1"));
     assertTrue(collections.toList().contains("c2"));
     assertTrue(collections.toList().contains("c3"));
-    assertTrue(collections.toList().contains("objectlabs-system"));
+    assertFalse(collections.toList().contains("view1"));
   }
 
   @Test
