@@ -16,6 +16,7 @@ public class ApiPathBuilder {
   private String collection;
   private String object;
   private Map<String, String> query = new HashMap<>();
+  private boolean users;
 
   private ApiPathBuilder() {}
 
@@ -63,6 +64,11 @@ public class ApiPathBuilder {
     return this;
   }
 
+  public ApiPathBuilder users() {
+    setUsers(true);
+    return this;
+  }
+
   public ApiPathBuilder query(final String key, final Object value) {
     query.put(key, value.toString());
     return this;
@@ -97,6 +103,8 @@ public class ApiPathBuilder {
           }
         } else if(getCommands()) {
           sb.append("/commands");
+        } else if(getUsers()) {
+          sb.append("/users");
         }
       }
     }
@@ -143,6 +151,14 @@ public class ApiPathBuilder {
 
   public void setCommands(final boolean pCommands) {
     commands = pCommands;
+  }
+
+  public boolean getUsers() {
+    return users;
+  }
+
+  public void setUsers(final boolean pUsers) {
+    users = pUsers;
   }
 
   private String getCluster() {
