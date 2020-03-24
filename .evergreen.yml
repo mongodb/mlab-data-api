@@ -14,11 +14,27 @@ functions:
         args:
           - install
           - test
+  "build docker image":
+    - command: git.get_project
+      params:
+        directory: src
+    - command: subprocess.exec
+      params:
+        working_dir: src
+        binary: docker
+        args:
+          - build
+          - -t
+          - mlab-data-api
+          - .
 
 tasks:
 - name: test
   commands:
     - func: run tests
+- name: "build docker image"
+  commands:
+    - func: build docker image
 
 buildvariants:
 - name: main
@@ -27,3 +43,4 @@ buildvariants:
     - rhel70-small
   tasks:
     - test
+    - build docker image
