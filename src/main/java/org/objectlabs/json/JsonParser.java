@@ -21,6 +21,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.bson.BSONObject;
 import org.bson.BsonTimestamp;
+import org.bson.Document;
 import org.bson.types.BSONTimestamp;
 import org.bson.types.Binary;
 import org.bson.types.ObjectId;
@@ -370,6 +371,10 @@ public class JsonParser {
         } else {
             w.write(serialize(o));
         }
+    }
+
+    public Object jsonify(final Object o) {
+        return parse(serialize(o));
     }
 
     public static String prettyPrint(Object o, int indentFactor) {

@@ -11,12 +11,14 @@ public class ApiPathBuilder {
   private boolean databases;
   private boolean collections;
   private boolean runCommand;
+  private boolean commands;
   private String cluster;
   private String db;
   private String collection;
   private String object;
   private Map<String, String> query = new HashMap<>();
   private boolean listDatabases;
+  private boolean users;
 
   private ApiPathBuilder() {}
 
@@ -69,6 +71,16 @@ public class ApiPathBuilder {
     return this;
   }
 
+  public ApiPathBuilder commands() {
+    setCommands(true);
+    return this;
+  }
+
+  public ApiPathBuilder users() {
+    setUsers(true);
+    return this;
+  }
+
   public ApiPathBuilder query(final String key, final Object value) {
     query.put(key, value.toString());
     return this;
@@ -108,6 +120,10 @@ public class ApiPathBuilder {
           }
         } else if(getRunCommand()) {
           sb.append("/runCommand");
+        } else if(getCommands()) {
+          sb.append("/commands");
+        } else if(getUsers()) {
+          sb.append("/users");
         }
       }
     } else if(getRunCommand()) {
@@ -164,6 +180,22 @@ public class ApiPathBuilder {
 
   private void setListDatabases(final boolean pListDatabases) {
     listDatabases = pListDatabases;
+  }
+
+  public boolean getCommands() {
+    return commands;
+  }
+
+  public void setCommands(final boolean pCommands) {
+    commands = pCommands;
+  }
+
+  public boolean getUsers() {
+    return users;
+  }
+
+  public void setUsers(final boolean pUsers) {
+    users = pUsers;
   }
 
   private String getCluster() {

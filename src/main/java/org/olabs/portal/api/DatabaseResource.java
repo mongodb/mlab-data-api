@@ -50,6 +50,10 @@ public class DatabaseResource extends PortalRESTResource {
     final String head = uri.getHead();
     if (head.equals("collections")) {
       r = new DBCollectionsResource(getDatabase());
+    } else if (head.equals("users")) {
+      r = new DBUsersResource(getDatabase());
+    } else if (head.equals("commands")) {
+      r = new CommandsResource(getDatabase());
     } else if (head.equals("runCommand")) {
       r = new RunCommandResource(getDatabase());
     }
@@ -59,9 +63,6 @@ public class DatabaseResource extends PortalRESTResource {
       r = new CommandsResource(getDatabase());
     } else if (head.equals("status")) {
       r = new DBStatusResource(getDatabase());
-    } else if (head.equals("users")) {
-      r = new DBUsersResource(getDatabase());
-    }
    */
 
     Resource result = null;

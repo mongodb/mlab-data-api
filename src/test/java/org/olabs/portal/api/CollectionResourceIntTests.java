@@ -8,7 +8,6 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
-import static org.objectlabs.mongodb.MongoUtils.oid;
 import static org.objectlabs.mongodb.MongoUtils.toISODateString;
 
 import com.mongodb.BasicDBObject;
@@ -104,35 +103,6 @@ public class CollectionResourceIntTests extends BaseResourceTest {
             .collect(Collectors.toList())
             .containsAll(List.of("1", "2", "3")));
     all.forEach(o -> assertTestDocumentValid((JSONObject) o));
-  }
-
-  private void assertTestDocumentValid(final JSONObject o) {
-    // date
-    assertEquals(MongoUtils.toISODateString(TEST_DATE), ((JSONObject) o.get("date")).get("$date"));
-    // int
-    assertEquals(100, o.get("int"));
-    // string
-    assertEquals("string", o.get("string"));
-    // ObjectId
-    assertTrue(((JSONObject) o.get("objectid")).has("$oid"));
-    assertEquals(oid(1000).toHexString(), ((JSONObject) o.get("objectid")).get("$oid"));
-    // boolean
-    assertEquals(false, o.get("boolean"));
-    // array
-    assertEquals(List.of("a", "b", "c"), ((JSONArray) o.get("array")).toList());
-    // object
-    assertEquals(Map.of("a", 1, "b", 2, "c", 3), ((JSONObject) o.get("object")).toMap());
-    // uuid
-    assertEquals(TEST_UUID.toString(), ((JSONObject) o.get("uuid")).get("$uuid"));
-    // binary
-    assertEquals("00", ((JSONObject) o.get("binary")).getString("$type"));
-    assertEquals("AQIDBA==", ((JSONObject) o.get("binary")).getString("$binary"));
-    // dbref
-    assertEquals("this", ((JSONObject) o.get("dbref")).get("$ref"));
-    assertEquals("that", ((JSONObject) o.get("dbref")).get("$id"));
-    // timestamp
-    assertEquals(1000000000, ((JSONObject) o.get("timestamp")).get("$ts"));
-    assertEquals(100, ((JSONObject) o.get("timestamp")).get("$inc"));
   }
 
   @Test

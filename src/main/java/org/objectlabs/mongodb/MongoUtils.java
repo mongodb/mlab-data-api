@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 
 public class MongoUtils {
@@ -66,7 +67,8 @@ public class MongoUtils {
 
   public static DBObject findOne(MongoCollection collection, BasicDBObject query) {
     final MongoCursor cursor = collection.find(query).limit(1).iterator();
-    return cursor.hasNext() ? (DBObject) cursor.next() : null;
+    final Document document = cursor.hasNext() ? (Document) cursor.next() : null;
+    return document == null ? null : new BasicDBObject(document);
   }
 
   public static DBObject findOneById(MongoCollection collection, Object id) {
