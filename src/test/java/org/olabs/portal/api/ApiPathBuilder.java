@@ -10,11 +10,13 @@ public class ApiPathBuilder {
   private boolean clusters;
   private boolean databases;
   private boolean collections;
+  private boolean runCommand;
   private String cluster;
   private String db;
   private String collection;
   private String object;
   private Map<String, String> query = new HashMap<>();
+  private boolean listDatabases;
 
   private ApiPathBuilder() {}
 
@@ -52,6 +54,16 @@ public class ApiPathBuilder {
     return this;
   }
 
+  public ApiPathBuilder runCommand() {
+    setRunCommand(true);
+    return this;
+  }
+
+  public ApiPathBuilder listDatabases() {
+    setListDatabases(true);
+    return this;
+  }
+
   public ApiPathBuilder collections() {
     setCollections(true);
     return this;
@@ -67,7 +79,12 @@ public class ApiPathBuilder {
       final StringBuilder sb = new StringBuilder();
       sb.append("/clusters");
       if (getCluster() != null) {
-        sb.append("/").append(getCluster()).append(getDbPath());
+        sb.append("/").append(getCluster());
+        if (getListDatabases()) {
+          sb.append("/listDatabases");
+        } else {
+          sb.append(getDbPath());
+        }
       }
       return sb.toString();
     } else {
@@ -89,8 +106,12 @@ public class ApiPathBuilder {
               sb.append("/").append(getObject());
             }
           }
+        } else if(getRunCommand()) {
+          sb.append("/runCommand");
         }
       }
+    } else if(getRunCommand()) {
+      sb.append("/runCommand");
     }
     if (!getQuery().isEmpty()) {
       sb.append("?");
@@ -127,6 +148,22 @@ public class ApiPathBuilder {
 
   private void setCollections(final boolean pCollections) {
     collections = pCollections;
+  }
+
+  private boolean getRunCommand() {
+    return runCommand;
+  }
+
+  private void setRunCommand(final boolean pRunCommand) {
+    runCommand = pRunCommand;
+  }
+
+  private boolean getListDatabases() {
+    return listDatabases;
+  }
+
+  private void setListDatabases(final boolean pListDatabases) {
+    listDatabases = pListDatabases;
   }
 
   private String getCluster() {

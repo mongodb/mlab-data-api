@@ -12,21 +12,14 @@ import static org.objectlabs.mongodb.MongoUtils.oid;
 import static org.objectlabs.mongodb.MongoUtils.toISODateString;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
-import com.mongodb.DBRef;
 import com.mongodb.client.MongoCollection;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
-import org.bson.BsonTimestamp;
-import org.bson.Document;
-import org.bson.types.Binary;
 import org.bson.types.ObjectId;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,9 +35,6 @@ import org.slf4j.LoggerFactory;
 public class CollectionResourceIntTests extends BaseResourceTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(CollectionResourceIntTests.class);
-  private static final Date TEST_DATE = new Date(1000000000);
-  private static final UUID TEST_UUID = UUID.randomUUID();
-  private static final Binary TEST_BINARY = new Binary(new byte[] {1, 2, 3, 4});
   private static final String TEST_DB = "test";
   private static final String TEST_GET_COLLECTION = new ObjectId().toString();
   private static final String TEST_POST_COLLECTION = new ObjectId().toString();
@@ -564,26 +554,5 @@ public class CollectionResourceIntTests extends BaseResourceTest {
 
   private ApiPathBuilder getCollectionUrl(final String collection) {
     return ApiPathBuilder.start().cluster(DEDICATED_CLUSTER_ID).db(TEST_DB).collection(collection);
-  }
-
-  private static Map makeTestMap(final String variable) {
-    final Map<String, Object> m = new HashMap<>();
-    m.put("date", TEST_DATE);
-    m.put("int", 100);
-    m.put("string", "string");
-    m.put("objectid", oid(1000));
-    m.put("boolean", false);
-    m.put("array", new JSONArray(List.of("a", "b", "c")));
-    m.put("object", BasicDBObjectBuilder.start().add("a", 1).add("b", 2).add("c", 3).get());
-    m.put("uuid", TEST_UUID);
-    m.put("binary", TEST_BINARY);
-    m.put("dbref", new DBRef("this", "that"));
-    m.put("timestamp", new BsonTimestamp(1000000000, 100));
-    m.put("variable", variable);
-    return m;
-  }
-
-  private static Document makeTestDocument(final String variable) {
-    return new Document(makeTestMap(variable));
   }
 }

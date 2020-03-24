@@ -31,32 +31,32 @@ public class DatabaseResource extends PortalRESTResource {
     return (database);
   }
 
-  public void setDatabase(MongoDatabase value) {
+  public void setDatabase(final MongoDatabase value) {
     database = value;
   }
 
   @Override
-  public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
-    BasicDBList result = new BasicDBList();
+  public Object handleGet(final Map parameters, final RequestContext context) throws ResourceException {
+    final BasicDBList result = new BasicDBList();
     result.add("collections");
     result.add("commands");
     result.add("runCommand");
     return (result);
   }
 
-  public Resource resolveRelative(Uri uri) {
+  public Resource resolveRelative(final Uri uri) {
 
     Resource r = null;
-    String head = uri.getHead();
+    final String head = uri.getHead();
     if (head.equals("collections")) {
       r = new DBCollectionsResource(getDatabase());
+    } else if (head.equals("runCommand")) {
+      r = new RunCommandResource(getDatabase());
     }
 
     /*
     } else if (head.equals("commands")) {
       r = new CommandsResource(getDatabase());
-    } else if (head.equals("runCommand")) {
-      r = new RunCommandResource(getDatabase());
     } else if (head.equals("status")) {
       r = new DBStatusResource(getDatabase());
     } else if (head.equals("users")) {
