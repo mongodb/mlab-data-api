@@ -16,6 +16,7 @@ import java.io.Writer;
 import java.util.Base64;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import org.bson.BSONObject;
@@ -307,10 +308,10 @@ public class JsonParser {
         if(o instanceof JSONArray) {
             return ((JSONArray)o).toList().stream().map(e -> deepMap(e, f)).collect(Collectors.toList());
         }
-        if(o instanceof Document) {
+        if(o instanceof Map) {
             final DBObject obj = new BasicDBObject();
-            for(final String key : ((Document) o).keySet()) {
-                obj.put(key, deepMap(((Document) o).get(key), f));
+            for(final Object key : ((Map) o).keySet()) {
+                obj.put((String) key, deepMap(((Map) o).get(key), f));
             }
             return obj;
         }

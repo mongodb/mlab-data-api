@@ -52,11 +52,11 @@ public class DatabaseResource extends PortalRESTResource {
       r = new DBCollectionsResource(getDatabase());
     } else if (head.equals("users")) {
       r = new DBUsersResource(getDatabase());
+    } else if (head.equals("commands")) {
+      r = new CommandsResource(getDatabase());
     }
 
     /*
-    } else if (head.equals("commands")) {
-      r = new CommandsResource(getDatabase());
     } else if (head.equals("runCommand")) {
       r = new RunCommandResource(getDatabase());
     } else if (head.equals("status")) {
