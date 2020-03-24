@@ -32,7 +32,7 @@ tasks:
 - name: test
   commands:
     - func: run tests
-- name: "build docker image"
+- name: docker
   commands:
     - func: build docker image
 
@@ -43,4 +43,4 @@ buildvariants:
     - rhel70-small
   tasks:
     - test
-    - build docker image
+    - docker
