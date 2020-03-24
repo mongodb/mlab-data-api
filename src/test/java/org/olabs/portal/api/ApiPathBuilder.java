@@ -17,7 +17,6 @@ public class ApiPathBuilder {
   private String collection;
   private String object;
   private Map<String, String> query = new HashMap<>();
-  private boolean listDatabases;
   private boolean users;
 
   private ApiPathBuilder() {}
@@ -61,11 +60,6 @@ public class ApiPathBuilder {
     return this;
   }
 
-  public ApiPathBuilder listDatabases() {
-    setListDatabases(true);
-    return this;
-  }
-
   public ApiPathBuilder collections() {
     setCollections(true);
     return this;
@@ -91,12 +85,7 @@ public class ApiPathBuilder {
       final StringBuilder sb = new StringBuilder();
       sb.append("/clusters");
       if (getCluster() != null) {
-        sb.append("/").append(getCluster());
-        if (getListDatabases()) {
-          sb.append("/listDatabases");
-        } else {
-          sb.append(getDbPath());
-        }
+        sb.append("/").append(getCluster()).append(getDbPath());
       }
       return sb.toString();
     } else {
@@ -172,14 +161,6 @@ public class ApiPathBuilder {
 
   private void setRunCommand(final boolean pRunCommand) {
     runCommand = pRunCommand;
-  }
-
-  private boolean getListDatabases() {
-    return listDatabases;
-  }
-
-  private void setListDatabases(final boolean pListDatabases) {
-    listDatabases = pListDatabases;
   }
 
   public boolean getCommands() {

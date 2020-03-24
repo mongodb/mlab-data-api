@@ -40,8 +40,6 @@ public class ClusterResource extends PortalRESTResource {
       } else {
         throw new ResourceException(HttpServletResponse.SC_NOT_FOUND);
       }
-    } else if (head.equals("listDatabases")) {
-      r = new ListDatabasesResource();
     }
 
     if (r != null) {
