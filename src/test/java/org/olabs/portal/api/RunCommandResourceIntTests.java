@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
+import javax.servlet.http.HttpServletResponse;
 import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.json.JSONObject;
@@ -35,6 +36,7 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
   private static final Logger LOG = LoggerFactory.getLogger(RunCommandResource.class);
   private static final String TEST_DB = "test";
   private static final String TEST_COLLECTION = new ObjectId().toHexString();
+  private static final String INVALID_COMMAND = "invalidCommand";
   private static final String DEDICATED_CLUSTER_URL =
       ApiPathBuilder.start().cluster(DEDICATED_CLUSTER_ID).runCommand().toString();
   private static final String DEDICATED_DB_URL =
@@ -83,6 +85,8 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
                 data.add(new Object[] {getTestClient(), url, cmd});
                 data.add(new Object[] {getProductionClient(), url, cmd});
               });
+          data.add(new Object[]{getTestClient(), url, INVALID_COMMAND});
+          data.add(new Object[]{getProductionClient(), url, INVALID_COMMAND});
         });
     return data;
   }
@@ -138,7 +142,7 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
       final JSONObject result = client.postJson(url, commandObj.toJson());
       getAssertions().accept(result);
     } catch (final ResourceException e) {
-      fail(String.format("%s failed for %s: %s", command, url, e.getMessage()));
+      handleError(e);
     }
   }
 
@@ -225,8 +229,19 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
           ASSERT_SUCCESS.accept(result);
           assertEquals("new", result.getJSONObject("value").getString("newField"));
         };
+      case INVALID_COMMAND:
+        return result -> fail("Expected invalid command to fail");
       default:
         return ASSERT_SUCCESS;
+    }
+  }
+
+  private void handleError(final ResourceException e) {
+    if(command.equals(INVALID_COMMAND)) {
+      assertEquals(HttpServletResponse.SC_BAD_REQUEST, e.getStatusCode());
+      assertTrue(e.getMessage().contains("invalid or unsupported"));
+    } else {
+      fail(String.format("%s failed for %s: %s", command, url, e.getMessage()));
     }
   }
 }

@@ -118,12 +118,8 @@ public class MlabDataApiClient {
       }
       return trimmed;
     } else {
-      LOG.error(
-          "[{}] {}: {}",
-          response.getStatusLine().getStatusCode(),
-          response.getStatusLine().getReasonPhrase(),
-          EntityUtils.toString(response.getEntity()));
-      throw new ResourceException(status);
+      final String msg = EntityUtils.toString(response.getEntity());
+      throw new ResourceException(status, msg);
     }
   }
 
