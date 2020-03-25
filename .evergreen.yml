@@ -20,9 +20,11 @@ functions:
       params:
         working_dir: mlab-data-api/src
         script: |
-          if [ "${branch_name}" != master ]; then
+          if [ "${branch_name}" != "master" ]; then
             echo "Skipping docker image publication because branch is not master (${branch_name})"
             exit 0
+          else
+            echo "Publishing docker image for branch ${branch_name}"
           fi
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
