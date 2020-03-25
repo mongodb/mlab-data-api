@@ -15,66 +15,35 @@ functions:
         args:
           - install
           - test
-  "build docker image":
-    - command: subprocess.exec
-      params:
-        working_dir: mlab-data-api/src
-        binary: docker
-        args:
-          - build
-          - -t
-          - mlab-data-api
-          - .
-  "login to ecr":
+  "publish docker image":
     - command: shell.exec
       params:
+        working_dir: mlab-data-api/src
         script: |
+          if [ "${branch_name}" != master ]; then
+            echo "Skipping docker image publication because branch is not master (${branch_name})"
+            exit 0
+          fi
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
           export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
           export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
           ./aws/dist/aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_DOCKER_TAG}
-  "tag docker image":
-    - command: subprocess.exec
-      params:
-        working_dir: mlab-data-api/src
-        binary: docker
-        args:
-          - tag
-          - mlab-data-api:latest
-          - ${AWS_ECR_DOCKER_TAG}:latest
-  "publish docker image":
-    - command: subprocess.exec
-      params:
-        working_dir: mlab-data-api/src
-        binary: docker
-        args:
-          - push
-          - ${AWS_ECR_DOCKER_TAG}:latest
+          docker build -t mlab-data-api .
+          docker tag mlab-data-api:latest ${AWS_ECR_DOCKER_TAG}:latest
+          docker push ${AWS_ECR_DOCKER_TAG}:latest
 
 tasks:
 - name: test
   commands:
     - func: fetch source
     - func: run tests
-- name: docker
-  commands:
-    - func: fetch source
-    - func: login to ecr
-    - func: build docker image
-    - func: tag docker image
     - func: publish docker image
 
 buildvariants:
 - name: test
-  display_name: run tests
+  display_name: test and publish
   run_on:
     - ubuntu1804
   tasks:
     - test
-- name: docker
-  display_name: publish docker image
-  run_on:
-    - ubuntu1804
-  tasks:
-    - docker
