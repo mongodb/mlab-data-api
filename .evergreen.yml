@@ -15,15 +15,16 @@ functions:
         args:
           - install
           - test
-  "install aws cli":
-    - command: shell.exec
+  "build docker image":
+    - command: subprocess.exec
       params:
-        working_dir: mlab-data-api
-        shell: bash
-        script: |
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          sudo ./aws/install
+        working_dir: mlab-data-api/src
+        binary: docker
+        args:
+          - build
+          - -t
+          - mlab-data-api
+          - .
 
 tasks:
 - name: test
@@ -33,18 +34,18 @@ tasks:
 - name: docker
   commands:
     - func: fetch source
-    - func: install aws cli
+    - func: build docker image
 
 buildvariants:
 - name: test
   display_name: run tests
   run_on:
-    - rhel76-small
+    - ubuntu1804
   tasks:
     - test
 - name: docker
   display_name: publish docker image
   run_on:
-    - rhel76-small
+    - ubuntu1804
   tasks:
     - docker
