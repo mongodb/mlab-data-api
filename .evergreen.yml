@@ -25,6 +25,30 @@ functions:
           - -t
           - mlab-data-api
           - .
+  "login to ecr":
+    - command: shell.exec
+      params:
+        script: |
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_DOCKER_TAG}
+  "tag docker image":
+    - command: subprocess.exec
+      params:
+        working_dir: mlab-data-api/src
+        binary: docker
+        args:
+          - tag
+          - mlab-data-api:latest
+          - ${AWS_ECR_DOCKER_TAG}:latest
+  "publish docker image":
+    - command: subprocess.exec
+      params:
+        working_dir: mlab-data-api/src
+        binary: docker
+        args:
+          - push
+          - ${AWS_ECR_DOCKER_TAG}:latest
 
 tasks:
 - name: test
@@ -34,7 +58,10 @@ tasks:
 - name: docker
   commands:
     - func: fetch source
+    - func: login to ecr
     - func: build docker image
+    - func: tag docker image
+    - func: publish docker image
 
 buildvariants:
 - name: test
