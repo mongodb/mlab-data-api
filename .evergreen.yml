@@ -1,11 +1,12 @@
 functions:
-  "run tests":
+  "fetch source":
     - command: git.get_project
       params:
-        directory: src
+        directory: mlab-data-api/src
+  "run tests":
     - command: subprocess.exec
       params:
-        working_dir: src
+        working_dir: mlab-data-api/src
         env:
           JAVA_HOME: /opt/java/jdk11
           MLAB_DATA_API_TEST_PROD_KEY: ${MLAB_DATA_API_TEST_PROD_KEY}
@@ -14,27 +15,25 @@ functions:
         args:
           - install
           - test
-  "build docker image":
-    - command: git.get_project
+  "install aws cli":
+    - command: shell.exec
       params:
-        directory: src
-    - command: subprocess.exec
-      params:
-        working_dir: src
-        binary: docker
-        args:
-          - build
-          - -t
-          - mlab-data-api
-          - .
+        working_dir: mlab-data-api
+        shell: bash
+        script: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
 
 tasks:
 - name: test
   commands:
+    - func: fetch source
     - func: run tests
 - name: docker
   commands:
-    - func: build docker image
+    - func: fetch source
+    - func: install aws cli
 
 buildvariants:
 - name: test
@@ -44,8 +43,8 @@ buildvariants:
   tasks:
     - test
 - name: docker
-  display_name: build docker image
+  display_name: publish docker image
   run_on:
-    - rhel76-docker
+    - rhel76-small
   tasks:
     - docker
