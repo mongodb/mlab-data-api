@@ -1,11 +1,12 @@
 functions:
-  "run tests":
+  "fetch source":
     - command: git.get_project
       params:
-        directory: src
+        directory: mlab-data-api/src
+  "run tests":
     - command: subprocess.exec
       params:
-        working_dir: src
+        working_dir: mlab-data-api/src
         env:
           JAVA_HOME: /opt/java/jdk11
           MLAB_DATA_API_TEST_PROD_KEY: ${MLAB_DATA_API_TEST_PROD_KEY}
@@ -14,16 +15,38 @@ functions:
         args:
           - install
           - test
+  "publish docker image":
+    - command: shell.exec
+      params:
+        working_dir: mlab-data-api/src
+        shell: bash
+        script: |
+          if [ "${is_patch}" = "true" ]; then
+            echo "Skipping docker image publication for patch build"
+            exit 0
+          else
+            echo "This is not a patch build"
+          fi
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+          ./aws/dist/aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_DOCKER_TAG}
+          docker build -t mlab-data-api .
+          docker tag mlab-data-api:latest ${AWS_ECR_DOCKER_TAG}:latest
+          docker push ${AWS_ECR_DOCKER_TAG}:latest
 
 tasks:
 - name: test
   commands:
+    - func: fetch source
     - func: run tests
+    - func: publish docker image
 
 buildvariants:
-- name: main
-  display_name: main
+- name: test
+  display_name: test and publish
   run_on:
-    - rhel70-small
+    - ubuntu1804
   tasks:
     - test
