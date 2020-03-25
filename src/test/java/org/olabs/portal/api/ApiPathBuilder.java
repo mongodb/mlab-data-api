@@ -10,6 +10,7 @@ public class ApiPathBuilder {
   private boolean clusters;
   private boolean databases;
   private boolean collections;
+  private boolean runCommand;
   private boolean commands;
   private String cluster;
   private String db;
@@ -51,6 +52,11 @@ public class ApiPathBuilder {
 
   public ApiPathBuilder databases() {
     setDatabases(true);
+    return this;
+  }
+
+  public ApiPathBuilder runCommand() {
+    setRunCommand(true);
     return this;
   }
 
@@ -101,12 +107,16 @@ public class ApiPathBuilder {
               sb.append("/").append(getObject());
             }
           }
+        } else if(getRunCommand()) {
+          sb.append("/runCommand");
         } else if(getCommands()) {
           sb.append("/commands");
         } else if(getUsers()) {
           sb.append("/users");
         }
       }
+    } else if(getRunCommand()) {
+      sb.append("/runCommand");
     }
     if (!getQuery().isEmpty()) {
       sb.append("?");
@@ -143,6 +153,14 @@ public class ApiPathBuilder {
 
   private void setCollections(final boolean pCollections) {
     collections = pCollections;
+  }
+
+  private boolean getRunCommand() {
+    return runCommand;
+  }
+
+  private void setRunCommand(final boolean pRunCommand) {
+    runCommand = pRunCommand;
   }
 
   public boolean getCommands() {

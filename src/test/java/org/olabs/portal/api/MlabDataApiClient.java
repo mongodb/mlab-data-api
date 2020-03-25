@@ -20,8 +20,13 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.objectlabs.ws.ResourceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MlabDataApiClient {
+
+  private static final Logger LOG = LoggerFactory.getLogger(MlabDataApiClient.class);
+
   private final String _name;
   private final String _host;
   private final CloseableHttpClient _client;
@@ -91,7 +96,8 @@ public class MlabDataApiClient {
     return getName();
   }
 
-  private String getPathUrl(final String pPath) throws MalformedURLException, UnsupportedEncodingException {
+  private String getPathUrl(final String pPath)
+      throws MalformedURLException, UnsupportedEncodingException {
     final URL url = new URL(String.format("%s/api/1/%s", getHost(), pPath));
     final String delim = url.getQuery() == null || url.getQuery().isEmpty() ? "?" : "&";
     return String.format(
@@ -103,16 +109,17 @@ public class MlabDataApiClient {
     final int status = response.getStatusLine().getStatusCode();
     if (status == HttpStatus.SC_OK) {
       final String s = EntityUtils.toString(response.getEntity());
-      if(s == null) {
+      if (s == null) {
         return null;
       }
       final String trimmed = s.trim();
-      if(trimmed.equals("null")) {
+      if (trimmed.equals("null")) {
         return null;
       }
       return trimmed;
     } else {
-      throw new ResourceException(status);
+      final String msg = EntityUtils.toString(response.getEntity());
+      throw new ResourceException(status, msg);
     }
   }
 

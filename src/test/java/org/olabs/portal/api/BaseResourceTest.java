@@ -1,5 +1,6 @@
 package org.olabs.portal.api;
 
+import static org.objectlabs.mongodb.MongoUtils.oid;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.objectlabs.mongodb.MongoUtils.oid;

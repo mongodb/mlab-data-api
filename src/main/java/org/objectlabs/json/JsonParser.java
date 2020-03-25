@@ -311,7 +311,7 @@ public class JsonParser {
         if(o instanceof Map) {
             final DBObject obj = new BasicDBObject();
             for(final Object key : ((Map) o).keySet()) {
-                obj.put((String) key, deepMap(((Map) o).get(key), f));
+                obj.put(key.toString(), deepMap(((Map) o).get(key), f));
             }
             return obj;
         }
