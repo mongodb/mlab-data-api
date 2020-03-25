@@ -21,7 +21,7 @@ functions:
         working_dir: mlab-data-api/src
         shell: bash
         script: |
-          if [ "${is_patch}" == "true" ]; then
+          if [ "${is_patch}" = "true" ]; then
             echo "Skipping docker image publication for patch build"
             exit 0
           else
