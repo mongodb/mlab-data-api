@@ -23,6 +23,7 @@ functions:
         script: |
           if [ "${is_patch}" = "true" ]; then
             echo "Skipping docker image publication for patch build"
+            exit 0
           else
             echo "Publishing docker image to ${DOCKER_REPO}"
           fi
