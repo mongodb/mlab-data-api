@@ -23,18 +23,13 @@ functions:
         script: |
           if [ "${is_patch}" = "true" ]; then
             echo "Skipping docker image publication for patch build"
-            exit 0
           else
-            echo "This is not a patch build"
+            echo "Publishing docker image to ${DOCKER_REPO}"
           fi
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-          unzip awscliv2.zip
-          export AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
-          export AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
-          ./aws/dist/aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${AWS_ECR_DOCKER_TAG}
+          docker login --username ${DOCKER_REPO_USER} --password ${DOCKER_REPO_PASSWORD} ${DOCKER_REPO}
           docker build -t mlab-data-api .
-          docker tag mlab-data-api:latest ${AWS_ECR_DOCKER_TAG}:latest
-          docker push ${AWS_ECR_DOCKER_TAG}:latest
+          docker tag mlab-data-api:latest ${DOCKER_IMAGE}:latest
+          docker push ${DOCKER_IMAGE}:latest
 
 tasks:
 - name: test
