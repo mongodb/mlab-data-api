@@ -5,6 +5,7 @@ import com.mongodb.MongoClient;
 import com.mongodb.client.MongoDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -16,28 +17,29 @@ import com.mlab.ws.RequestContext;
 import com.mlab.ws.Resource;
 import com.mlab.ws.WebServiceException;
 
-public class MongoDBConnectionResource extends PortalRESTResource implements MongoBegotten {
+public class MongoDBConnectionResource extends PortalRESTResource {
 
-  public MongoDBConnectionResource(MongoClient mongo) {
+  private final MongoClient mongo;
+
+  public MongoDBConnectionResource(final MongoClient mongo) {
     this.mongo = mongo;
   }
 
   public String getName() {
-    return ("databases");
+    return "databases";
   }
 
   public String[] getMethods() {
-    return (new String[] {HttpMethod.GET.name()});
+    return new String[] {HttpMethod.GET.name()};
   }
-
-  private final MongoClient mongo;
 
   public MongoClient getMongo() {
-    return (mongo);
+    return mongo;
   }
 
-  protected Object handleGet(Map parameters, RequestContext context) throws WebServiceException {
-    Set<String> names = new TreeSet<String>();
+  protected Object handleGet(final Map parameters, final RequestContext context)
+      throws WebServiceException {
+    final Set<String> names = new TreeSet<>();
     if (parameters.containsKey("systemOnly")) {
       names.addAll(getDbNames());
       names.retainAll(MongoUtils.SYSTEM_DB_NAMES);
@@ -47,33 +49,33 @@ public class MongoDBConnectionResource extends PortalRESTResource implements Mon
         names.removeAll(MongoUtils.SYSTEM_DB_NAMES);
       }
     }
-    BasicDBList result = new BasicDBList();
+    final BasicDBList result = new BasicDBList();
     result.addAll(names);
     return result;
   }
 
   private Collection<String> getDbNames() {
-    final String authDb =
-        getApiConfig().getClusterUri(getParent().getName()).getDatabase();
+    final String authDb = getApiConfig().getClusterUri(getParent().getName()).getDatabase();
+    if (authDb == null) {
+      return Collections.emptyList();
+    }
     return authDb.equals(MongoUtils.ADMIN_DB_NAME)
         ? getMongo().listDatabaseNames().into(new ArrayList<>())
         : List.of(authDb);
   }
 
-  public Resource resolveRelative(Uri uri) {
-    Resource result = null;
-
-    String dbName = uri.getHead();
+  public Resource resolveRelative(final Uri uri) {
+    final String dbName = uri.getHead();
     if (dbName == null) {
       return null;
     }
-    MongoDatabase db = getMongo().getDatabase(dbName);
+    final MongoDatabase db = getMongo().getDatabase(dbName);
     if (db != null) {
-        result = new DatabaseResource(db);
-        result.setParent(this);
-        return result.resolve(uri.getTail());
+      final Resource result = new DatabaseResource(db);
+      result.setParent(this);
+      return result.resolve(uri.getTail());
     }
 
-    return (result);
+    return null;
   }
 }

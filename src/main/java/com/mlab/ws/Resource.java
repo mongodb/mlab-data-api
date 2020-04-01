@@ -7,81 +7,68 @@ import com.mlab.ns.Uri;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Resource implements WebService {
+public class Resource implements Namespace {
 
-  private static Logger logger = LoggerFactory.getLogger(Resource.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Resource.class);
   private String name;
   private Namespace parent;
 
   private static Logger getLogger() {
-    return (logger);
+    return LOGGER;
   }
 
   public String getName() {
     if (name == null) {
       name = "";
     }
-    return (name);
+    return name;
   }
 
-  public void setName(String value) {
+  public void setName(final String value) {
     name = value;
   }
 
   public String getAbsoluteName() {
-    String result = "";
+    final String result;
 
-    Namespace parent = getParent();
+    final Namespace parent = getParent();
     if (parent == null) {
       result = "/" + getName();
     } else {
       result = parent.getAbsoluteName() + "/" + getName();
     }
 
-    return (result);
+    return result;
   }
 
   public Namespace getParent() {
-    return (parent);
+    return parent;
   }
 
-  public void setParent(Namespace value) {
+  public void setParent(final Namespace value) {
     parent = value;
   }
 
-  public Namespace getParent(Class c) {
-    Namespace parent = getParent();
-    if (parent == null) {
-      return (null);
-    }
-
-    if (c.isAssignableFrom(parent.getClass())) {
-      return (parent);
-    }
-
-    return (parent.getParent(c));
-  }
-
   public Namespace getRoot() {
-    Namespace parent = getParent();
+    final Namespace parent = getParent();
     if (parent == null) {
-      return (this);
+      return this;
     }
 
-    return (parent.getRoot());
+    return parent.getRoot();
   }
 
-  public Resource resolve(String name) {
-    return (resolve(name == null ? null : new Uri(null, name)));
+  public Resource resolve(final String name) {
+    return resolve(name == null ? null : new Uri(null, name));
   }
 
-  public Resource resolve(Uri uri) {
+  public Resource resolve(final Uri uri) {
     if (uri == null || uri.hasEmptyPath()) {
-      return (this);
+      return this;
     }
 
     if (uri.isAbsolute()) {
-      Namespace parent = getParent();
+      final Namespace parent = getParent();
       if (parent != null) {
         return (Resource) parent.resolve(uri);
       }
@@ -90,11 +77,11 @@ public class Resource implements WebService {
     return resolveRelative(uri);
   }
 
-  public Resource resolveRelative(Uri uri) {
-    return (null);
+  public Resource resolveRelative(final Uri uri) {
+    return null;
   }
 
-  public void service(HttpServletRequest request, HttpServletResponse response) {
+  public void service(final HttpServletRequest request, final HttpServletResponse response) {
     getLogger().info("service(): " + getName());
   }
 }

@@ -55,6 +55,7 @@ public class CollectionResource extends PortalRESTResource {
   private static final String UPSERT_PARAM = "u";
 
   private static final String COUNT_PARAM = "c";
+  private MongoCollection<Document> collection;
 
   CollectionResource(final MongoCollection<Document> c) {
     super();
@@ -68,8 +69,6 @@ public class CollectionResource extends PortalRESTResource {
   public String getName() {
     return getCollection().getNamespace().getCollectionName();
   }
-
-  private MongoCollection<Document> collection;
 
   public MongoCollection<Document> getCollection() {
     return collection;

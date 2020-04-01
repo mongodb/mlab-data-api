@@ -52,17 +52,17 @@ public enum HttpStatus {
     GATEWAY_TIMEOUT(504),
     HTTP_VERSION_NOT_SUPPORTED(505);
 
-    HttpStatus(int code ) {
+    HttpStatus(final int code ) {
         setCode(code);
     }
 
     private int mCode;
     public int getCode ( )
     { return mCode; }
-    protected void setCode ( int code )
+    protected void setCode ( final int code )
     { mCode = code; }
 
-    public static HttpStatus lookup (int code ) {
+    public static HttpStatus lookup (final int code ) {
         if ( mLookupTable == null ) {
             synchronized ( mLookupTableBuildLock ) {
                 if ( mLookupTable == null ) {
@@ -78,8 +78,8 @@ public enum HttpStatus {
     private static volatile Map<Integer, HttpStatus> mLookupTable;
     private static final Object mLookupTableBuildLock = new Object();
     protected static void buildLookupTable ( ) {
-        Map<Integer, HttpStatus> t = new HashMap<Integer, HttpStatus>();
-        for ( HttpStatus status : values() ) {
+        final Map<Integer, HttpStatus> t = new HashMap<>();
+        for ( final HttpStatus status : values() ) {
             // Only put if there isn't a value in there already, honoring ordinality
             if ( !t.containsKey(status.getCode()) ) {
                 t.put(status.getCode(), status);

@@ -1,189 +1,158 @@
 package com.mlab.ns;
 
 import java.net.URI;
-import java.net.URISyntaxException;
 
 public class Uri {
 
-    public Uri() {
-        super();
+  private String scheme;
+  private Authority authority;
+  private Path path;
+  private String query;
+
+  public Uri() {
+    super();
+  }
+
+  public Uri(final URI uri) {
+    this(
+        uri.getScheme(),
+        uri.getAuthority(),
+        uri.getSchemeSpecificPart(),
+        uri.getPath(),
+        uri.getQuery());
+  }
+
+  public Uri(final String uri) {
+    try {
+      final URI u = new URI(uri);
+      configure(
+          u.getScheme(), u.getAuthority(), u.getSchemeSpecificPart(), u.getPath(), u.getQuery());
+    } catch (final Exception e) {
+      throw new IllegalArgumentException(e);
     }
+  }
 
-    public Uri(URI uri) {
-        this(uri.getScheme(),
-             uri.getAuthority(),
-             uri.getSchemeSpecificPart(),
-             uri.getPath(),
-             uri.getQuery());
+  public Uri(final String scheme, final String path) {
+    this(scheme, null, path);
+  }
+
+  public Uri(final String scheme, final String authority, final String path) {
+    this(scheme, authority, null, path, null);
+  }
+
+  public Uri(
+      final String scheme,
+      final String authority,
+      final String ssp,
+      final String path,
+      final String query) {
+    configure(scheme, authority, ssp, path, query);
+  }
+
+  public Uri(final String scheme, final Authority authority, final Path path, final String query) {
+    configure(scheme, authority, path, query);
+  }
+
+  private void configure(
+      final String scheme,
+      final String authority,
+      final String ssp,
+      String path,
+      final String query) {
+    if (path == null) {
+      path = ssp;
     }
+    configure(scheme, authority == null ? null : new Authority(authority), new Path(path), query);
+  }
 
-    public Uri(String uri) {
-        try {
-            URI u = new URI(uri);
-            configure(u.getScheme(),
-                      u.getAuthority(),
-                      u.getSchemeSpecificPart(),
-                      u.getPath(),
-                      u.getQuery());
-        } catch (Exception e) {
-            throw(new IllegalArgumentException(e));
-        }
+  private void configure(
+      final String scheme, final Authority authority, final Path path, final String query) {
+    setScheme(scheme);
+    setAuthority(authority);
+    setPath(path);
+    setQuery(query);
+  }
+
+  public String getScheme() {
+    return scheme;
+  }
+
+  public void setScheme(final String value) {
+    scheme = value;
+  }
+
+  public Authority getAuthority() {
+    return authority;
+  }
+
+  public void setAuthority(final Authority value) {
+    authority = value;
+  }
+
+  public Path getPath() {
+    if (path == null) path = new Path();
+    return path;
+  }
+
+  public void setPath(final Path value) {
+    path = value;
+  }
+
+  public String getQuery() {
+    return query;
+  }
+
+  public void setQuery(final String value) {
+    query = value;
+  }
+
+  public String getName() {
+    final Path path = getPath();
+    if (path.isEmpty()) {
+      return null;
     }
+    return path.getHead();
+  }
 
-    public Uri(String scheme, String path) {
-        this(scheme, null, path);
-    }
+  public String getAbsoluteName() {
+    final StringBuilder s = new StringBuilder();
 
-    public Uri(String scheme, String authority, String path) {
-        this(scheme, authority, null, path, null);
-    }
+    if (getScheme() != null) s.append(getScheme()).append(":");
+    if (getAuthority() != null) s.append(getAuthority());
+    s.append(getPath());
+    if (getQuery() != null) s.append("?").append(getQuery());
 
-    public Uri(String scheme,
-               String authority,
-               String ssp,
-               String path,
-               String query)
-    {
-        configure(scheme, authority, ssp, path, query);
-    }
+    return s.toString();
+  }
 
-    private void configure(String scheme,
-                           String authority,
-                           String ssp,
-                           String path,
-                           String query)
-    {
-        if (path == null) {
-            path = ssp;
-        }
-        configure(scheme,
-                  (authority == null) ? null : new Authority(authority),
-                  new Path(path),
-                  query);
-    }
+  public boolean isAbsolute() {
+    return getPath().isAbsolute();
+  }
 
-    public Uri(String scheme, Authority authority, Path path, String query) {
-        configure(scheme, authority, path, query);
-    }
+  public String getHead() {
+    return getPath().getHead();
+  }
 
-    private void configure(String scheme,
-                           Authority authority,
-                           Path path,
-                           String query)
-    {
-        setScheme(scheme);
-        setAuthority(authority);
-        setPath(path);
-        setQuery(query);
-    }
+  public Uri getTail() {
+    final Uri result = clone();
+    result.setPath(getPath().getTail());
+    return result;
+  }
 
-    private String scheme;
+  public boolean hasEmptyPath() {
+    return getPath().isEmpty();
+  }
 
-    public String getScheme() {
-        return(scheme);
-    }
+  public Uri clone() {
+    final Uri result = new Uri();
+    result.setScheme(getScheme());
+    result.setAuthority(getAuthority());
+    result.setPath(getPath());
+    result.setQuery(getQuery());
+    return result;
+  }
 
-    public void setScheme(String value) {
-        scheme = value;
-    }
-
-    private Authority authority;
-
-    public Authority getAuthority() {
-        return(authority);
-    }
-
-    public void setAuthority(Authority value) {
-        authority = value;
-    }
-
-    private Path path;
-
-    public Path getPath() {
-        if (path == null) path = new Path();
-        return(path);
-    }
-
-    public void setPath(Path value) {
-        path = value;
-    }
-
-    private String query;
-
-    public String getQuery() {
-        return(query);
-    }
-
-    public void setQuery(String value) {
-        query = value;
-    }
-
-    public String getName() {
-        Path path = getPath();
-        if (path.isEmpty()) {
-            return(null);
-        }
-        return(path.getHead());
-    }
-
-    public String getAbsoluteName() {
-        StringBuffer buff = new StringBuffer();
-
-        if (getScheme() != null) buff.append(getScheme()).append(":");
-        if (getAuthority() != null) buff.append(getAuthority());
-        buff.append(getPath());
-        if (getQuery() != null) buff.append("?").append(getQuery());
-
-        return(buff.toString());
-    }
-
-    public boolean isAbsolute() {
-        return(getPath().isAbsolute());
-    }
-
-    public String getHead() {
-        return(getPath().getHead());
-    }
-
-    public Uri getTail() {
-        Uri result = clone();
-        result.setPath(getPath().getTail());
-        return(result);
-    }
-
-    public Uri getParent() {
-        Uri result = clone();
-        result.setPath(getPath().getParent());
-        return(result);
-    }
-
-    public Uri resolve(String name) {
-        throw(new IllegalArgumentException("not implemented"));
-    }
-
-    public boolean hasEmptyPath() {
-        return(getPath().isEmpty());
-    }
-
-    public Uri clone() {
-        Uri result = new Uri();
-        result.setScheme(getScheme());
-        result.setAuthority(getAuthority());
-        result.setPath(getPath());
-        result.setQuery(getQuery());
-        return(result);
-    }
-
-    public URI toURI() {
-        try {
-            return(new URI(toString()));
-        } catch (URISyntaxException e) {
-            throw(new IllegalStateException(e));
-        }
-    }
-
-    public String toString() {
-        return(getAbsoluteName());
-    }
-
+  public String toString() {
+    return getAbsoluteName();
+  }
 }

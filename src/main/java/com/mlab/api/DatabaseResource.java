@@ -11,7 +11,7 @@ import com.mlab.ws.ResourceException;
 
 public class DatabaseResource extends PortalRESTResource {
 
-  private String[] methods = {HttpMethod.GET.name()};
+  private final String[] METHODS = {HttpMethod.GET.name()};
   private MongoDatabase database;
 
   public DatabaseResource(final MongoDatabase db) {
@@ -20,15 +20,15 @@ public class DatabaseResource extends PortalRESTResource {
   }
 
   public String[] getMethods() {
-    return (methods);
+    return METHODS;
   }
 
   public String getName() {
-    return (getDatabase().getName());
+    return getDatabase().getName();
   }
 
   public MongoDatabase getDatabase() {
-    return (database);
+    return database;
   }
 
   public void setDatabase(final MongoDatabase value) {
@@ -36,41 +36,39 @@ public class DatabaseResource extends PortalRESTResource {
   }
 
   @Override
-  public Object handleGet(final Map parameters, final RequestContext context) throws ResourceException {
+  public Object handleGet(final Map parameters, final RequestContext context)
+      throws ResourceException {
     final BasicDBList result = new BasicDBList();
     result.add("collections");
     result.add("commands");
     result.add("runCommand");
-    return (result);
+    return result;
   }
 
   public Resource resolveRelative(final Uri uri) {
 
     Resource r = null;
     final String head = uri.getHead();
-    if (head.equals("collections")) {
-      r = new DBCollectionsResource(getDatabase());
-    } else if (head.equals("users")) {
-      r = new DBUsersResource(getDatabase());
-    } else if (head.equals("commands")) {
-      r = new CommandsResource(getDatabase());
-    } else if (head.equals("runCommand")) {
-      r = new RunCommandResource(getDatabase());
+    switch (head) {
+      case "collections":
+        r = new DBCollectionsResource(getDatabase());
+        break;
+      case "users":
+        r = new DBUsersResource(getDatabase());
+        break;
+      case "commands":
+        r = new CommandsResource(getDatabase());
+        break;
+      case "runCommand":
+        r = new RunCommandResource(getDatabase());
+        break;
     }
 
-    /*
-    } else if (head.equals("commands")) {
-      r = new CommandsResource(getDatabase());
-    } else if (head.equals("status")) {
-      r = new DBStatusResource(getDatabase());
-   */
-
-    Resource result = null;
     if (r != null) {
       r.setParent(this);
-      result = r.resolve(uri.getTail());
+      return r.resolve(uri.getTail());
     }
 
-    return (result);
+    return null;
   }
 }

@@ -22,6 +22,10 @@ public class MongoUtils {
   public static final String LOCAL_DB_NAME = "local";
 
   public static final Collection<String> SYSTEM_DB_NAMES = new ArrayList<>();
+  public static final Collection<String> READ_ONLY_DB_NAMES = new ArrayList<>();
+  public static final Collection<String> READ_ONLY_COLLECTION_NAMES = new ArrayList<>();
+  private static final SimpleDateFormat ISO_DATE_FORMAT =
+      new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
   static {
     SYSTEM_DB_NAMES.add(LOCAL_DB_NAME);
@@ -29,19 +33,19 @@ public class MongoUtils {
     SYSTEM_DB_NAMES.add("config");
   }
 
-  public static final Collection<String> READ_ONLY_DB_NAMES = new ArrayList<>();
-
   static {
     READ_ONLY_DB_NAMES.add("config");
     READ_ONLY_DB_NAMES.add(LOCAL_DB_NAME);
   }
 
-  public static final Collection<String> READ_ONLY_COLLECTION_NAMES = new ArrayList<>();
-
   static {
     READ_ONLY_COLLECTION_NAMES.add("system.indexes");
     READ_ONLY_COLLECTION_NAMES.add("system.namespaces");
     READ_ONLY_COLLECTION_NAMES.add("objectlabs-system");
+  }
+
+  static {
+    ISO_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
   }
 
   public static List<String> getViewNames(final MongoDatabase db) {
@@ -115,17 +119,16 @@ public class MongoUtils {
   }
 
   public static boolean isCollectionReadOnly(final MongoCollection c) {
-    return isCollectionReadOnly(c.getNamespace().getDatabaseName(), c.getNamespace().getCollectionName());
+    return isCollectionReadOnly(
+        c.getNamespace().getDatabaseName(), c.getNamespace().getCollectionName());
   }
 
   public static boolean isCollectionReadOnly(final String dbName, final String collection) {
-    return isDatabaseReadOnly(dbName) || READ_ONLY_COLLECTION_NAMES.contains(collection) || collection.startsWith("objectlabs-system.");
+    return isDatabaseReadOnly(dbName)
+        || READ_ONLY_COLLECTION_NAMES.contains(collection)
+        || collection.startsWith("objectlabs-system.");
   }
 
-  private static final SimpleDateFormat ISO_DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-  static {
-    ISO_DATE_FORMAT.setTimeZone(TimeZone.getTimeZone("UTC"));
-  }
   public static String toISODateString(final Date date) {
     return ISO_DATE_FORMAT.format(date);
   }

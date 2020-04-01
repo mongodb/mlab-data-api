@@ -8,12 +8,12 @@ import com.mlab.ws.ResourceException;
 
 public class ClusterResource extends PortalRESTResource {
 
+  private String name;
+
   public ClusterResource(final String pName) {
     super();
     setName(pName);
   }
-
-  private String name;
 
   public String getName() {
     return name;
@@ -27,15 +27,15 @@ public class ClusterResource extends PortalRESTResource {
     return ApiConfig.getInstance().getClusterConnection(getName());
   }
 
-  public Resource resolveRelative(Uri uri) {
+  public Resource resolveRelative(final Uri uri) {
     Resource result = null;
 
-    String head = uri.getHead();
+    final String head = uri.getHead();
     Resource r = null;
     if (head.equals("databases")) {
       r = new MongoDBConnectionResource(getClusterConnection());
     } else if (head.equals("runCommand")) {
-      if(getAuthDb().equals("admin")) {
+      if (getAuthDb().equals("admin")) {
         r = new RunCommandResource(getClusterConnection().getDatabase("admin"));
       } else {
         throw new ResourceException(HttpServletResponse.SC_NOT_FOUND);
@@ -47,7 +47,7 @@ public class ClusterResource extends PortalRESTResource {
       result = r.resolve(uri.getTail());
     }
 
-    return (result);
+    return result;
   }
 
   private String getAuthDb() {

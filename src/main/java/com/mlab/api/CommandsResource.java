@@ -10,12 +10,13 @@ import com.mlab.ws.ResourceException;
 
 public class CommandsResource extends PortalRESTResource {
 
+  private static final String[] METHODS = {HttpMethod.GET.name()};
+  private MongoDatabase database;
+
   public CommandsResource(final MongoDatabase db) {
     super();
     setDatabase(db);
   }
-
-  private static final String[] METHODS = {HttpMethod.GET.name()};
 
   public String[] getMethods() {
     return METHODS;
@@ -24,8 +25,6 @@ public class CommandsResource extends PortalRESTResource {
   public String getName() {
     return "commands";
   }
-
-  private MongoDatabase database;
 
   public MongoDatabase getDatabase() {
     return database;

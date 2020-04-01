@@ -10,32 +10,32 @@ import com.mlab.ws.ResourceException;
 
 public class DatabasesResource extends PortalRESTResource {
 
-  private String[] methods = {HttpMethod.GET.name()};
+  private final String[] METHODS = {HttpMethod.GET.name()};
 
   public String[] getMethods() {
-    return (methods);
+    return METHODS;
   }
 
   @Override
-  public Object handleGet(Map parameters, RequestContext context) throws ResourceException {
+  public Object handleGet(final Map parameters, final RequestContext context)
+      throws ResourceException {
     final Map<String, String> clusters = getApiConfig().getDatabases();
     return clusters == null ? Collections.emptyList() : clusters.keySet();
   }
 
-  public Resource resolveRelative(Uri uri) {
+  public Resource resolveRelative(final Uri uri) {
     if (uri.hasEmptyPath()) {
-      return (this);
+      return this;
     }
 
-    String head = uri.getHead();
+    final String head = uri.getHead();
     if (head == null || head.equals("")) {
-      return (this);
+      return this;
     }
 
-    Resource r =
-        new MongoDBConnectionResource(getApiConfig().getDatabaseConnection(head))
-            .resolve(head);
+    final Resource r =
+        new MongoDBConnectionResource(getApiConfig().getDatabaseConnection(head)).resolve(head);
     r.setParent(this);
-    return (r.resolve(uri.getTail()));
+    return r.resolve(uri.getTail());
   }
 }

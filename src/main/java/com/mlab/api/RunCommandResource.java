@@ -6,6 +6,7 @@ import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoDatabase;
 import java.net.SocketTimeoutException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -42,7 +43,8 @@ public class RunCommandResource extends PortalRESTResource {
           "serverStatus",
           "getCmdLineOpts",
           "top");
-  public static final List<String> SUPPORTED_PARAMETERS = Arrays.asList("failIndexKeyTooLong");
+  public static final List<String> SUPPORTED_PARAMETERS =
+      Collections.singletonList("failIndexKeyTooLong");
   private static final String[] METHODS = {HttpMethod.GET.name(), HttpMethod.POST.name()};
   private MongoDatabase database;
 

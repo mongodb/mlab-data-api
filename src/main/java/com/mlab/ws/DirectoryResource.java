@@ -11,28 +11,27 @@ public class DirectoryResource extends PortalRESTResource {
   private List<Resource> children;
 
   public String[] getMethods() {
-    String[] result = {HttpMethod.GET.name()};
-    return (result);
+    return new String[] {HttpMethod.GET.name()};
   }
 
   public List<Resource> getChildren() {
     if (children == null) {
-      children = new ArrayList<Resource>();
+      children = new ArrayList<>();
     }
-    return (children);
+    return children;
   }
 
-  public void setChildren(List<Resource> value) {
+  public void setChildren(final List<Resource> value) {
     children = value;
   }
 
-  public Resource resolveRelative(Uri uri) {
-    String head = uri.getHead();
-    for (Resource r : getChildren()) {
+  public Resource resolveRelative(final Uri uri) {
+    final String head = uri.getHead();
+    for (final Resource r : getChildren()) {
       if (r.getName().equals(head)) {
-        return (r.resolve(uri.getTail()));
+        return r.resolve(uri.getTail());
       }
     }
-    return (null);
+    return null;
   }
 }

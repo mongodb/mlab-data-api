@@ -30,7 +30,7 @@ public class MongoDBConnectionResourceIntTests extends BaseResourceTest {
             assertNotNull(dbs);
             assertEquals(expectedDbs.size(), dbs.length());
             assertTrue(expectedDbs.containsAll(dbs.toList()));
-          } catch (IOException e) {
+          } catch (final IOException e) {
             fail(e.getMessage());
           }
         });

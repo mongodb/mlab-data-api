@@ -5,28 +5,26 @@ import javax.servlet.http.HttpServletResponse;
 
 public class RequestContext {
 
-    public RequestContext() {
-        super();
-    }
+  private HttpServletRequest servletRequest;
+  private HttpServletResponse servletResponse;
 
-    private HttpServletRequest servletRequest;
+  public RequestContext() {
+    super();
+  }
 
-    public HttpServletRequest getServletRequest() {
-        return(servletRequest);
-    }
+  public HttpServletRequest getServletRequest() {
+    return servletRequest;
+  }
 
-    public void setServletRequest(HttpServletRequest value) {
-        servletRequest = value;
-    }
+  public void setServletRequest(final HttpServletRequest value) {
+    servletRequest = value;
+  }
 
-    private HttpServletResponse servletResponse;
+  public HttpServletResponse getServletResponse() {
+    return servletResponse;
+  }
 
-    public HttpServletResponse getServletResponse() {
-        return(servletResponse);
-    }
-
-    public void setServletResponse(HttpServletResponse value) {
-        servletResponse = value;
-    }
-
+  public void setServletResponse(final HttpServletResponse value) {
+    servletResponse = value;
+  }
 }

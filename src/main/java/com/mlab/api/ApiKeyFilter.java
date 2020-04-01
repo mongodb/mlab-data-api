@@ -20,8 +20,8 @@ public class ApiKeyFilter implements Filter {
     final String apiKey = ApiConfig.getApiKey();
     final String requestKey = request.getParameter("apiKey");
 
-    if(apiKey == null || !apiKey.equals(requestKey)) {
-      ((HttpServletResponse)response).setStatus(HttpServletResponse.SC_FORBIDDEN);
+    if (apiKey == null || !apiKey.equals(requestKey)) {
+      ((HttpServletResponse) response).setStatus(HttpServletResponse.SC_FORBIDDEN);
       return;
     }
 

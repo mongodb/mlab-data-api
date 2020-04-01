@@ -2,84 +2,68 @@ package com.mlab.ns;
 
 public class Authority {
 
-    public Authority() {
-        super();
+  private String userInfo;
+  private String host;
+  private int port = -1;
+
+  public Authority(final String authority) {
+    if (authority == null || authority.equals("")) {
+      throw new IllegalArgumentException("authority cannot be null");
     }
 
-    public Authority(String authority) {
-        if (authority == null || authority.equals("")) {
-            throw(new IllegalArgumentException("authority cannot be null"));
+    final int indexOfAt = authority.indexOf("@");
+    if (indexOfAt != -1) {
+      setUserInfo(authority.substring(0, indexOfAt));
+    }
+
+    final int hostIndex = indexOfAt + 1;
+    final int colonIndex = authority.lastIndexOf(":");
+    if (colonIndex == -1) {
+      setHost(authority.substring(hostIndex));
+    } else {
+      setHost(authority.substring(hostIndex, colonIndex));
+      final String portString = authority.substring(colonIndex + 1);
+      if (!portString.equals("")) {
+        try {
+          setPort(Integer.parseInt(portString));
+        } catch (final Exception e) {
+          throw new IllegalArgumentException("port must be numeric");
         }
-
-        int indexOfAt = authority.indexOf("@");
-        if (indexOfAt != -1) {
-            setUserInfo(authority.substring(0, indexOfAt));
-        }
-
-        int hostIndex = indexOfAt + 1;
-        int colonIndex = authority.lastIndexOf(":");
-        if (colonIndex == -1) {
-            setHost(authority.substring(hostIndex));
-        } else {
-            setHost(authority.substring(hostIndex, colonIndex));
-            String portString = authority.substring(colonIndex + 1);
-            if (portString != null && !portString.equals("")) {
-                try {
-                    setPort(Integer.parseInt(portString));
-                } catch (Exception e) {
-                    throw(new IllegalArgumentException("port must be numeric"));
-                }
-            }
-        }
+      }
     }
+  }
 
-    public Authority(String host, int port) {
-        this(null, host, port);
-    }
+  public String getUserInfo() {
+    return userInfo;
+  }
 
-    public Authority(String userInfo, String host, int port) {
-        setUserInfo(userInfo);
-        setHost(host);
-        setPort(port);
-    }
+  public void setUserInfo(final String value) {
+    userInfo = value;
+  }
 
-    private String userInfo;
+  public String getHost() {
+    return host;
+  }
 
-    public String getUserInfo() {
-        return(userInfo);
-    }
+  public void setHost(final String value) {
+    host = value;
+  }
 
-    public void setUserInfo(String value) {
-        userInfo = value;
-    }
+  public int getPort() {
+    return port;
+  }
 
-    private String host;
+  public void setPort(final int value) {
+    port = value;
+  }
 
-    public String getHost() {
-        return(host);
-    }
+  public String toString() {
+    final StringBuilder s = new StringBuilder();
 
-    public void setHost(String value) {
-        host = value;
-    }
+    if (getUserInfo() != null) s.append(getUserInfo()).append("@");
+    s.append(getHost());
+    if (getPort() != -1) s.append(":").append(getPort());
 
-    private int port = -1;
-
-    public int getPort() {
-        return(port);
-    }
-
-    public void setPort(int value) {
-        port = value;
-    }
-
-    public String toString() {
-        StringBuffer buff = new StringBuffer();
-
-        if (getUserInfo() != null) buff.append(getUserInfo()).append("@");
-        buff.append(getHost());
-        if (getPort() != -1) buff.append(":").append(getPort());
-
-        return(buff.toString());
-    }
+    return s.toString();
+  }
 }

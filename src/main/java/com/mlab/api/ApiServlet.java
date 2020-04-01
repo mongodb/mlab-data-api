@@ -24,48 +24,6 @@ public class ApiServlet extends HttpServlet {
 
   private static final Logger LOG = LoggerFactory.getLogger(ApiServlet.class);
 
-  @Override
-  public void service(final HttpServletRequest req, final HttpServletResponse res) {
-    try {
-      final String path = req.getPathInfo();
-      final Resource resource = new RootResource().resolve(path);
-      if (resource == null) {
-        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
-      } else {
-        resource.service(req, res);
-      }
-    } catch (final Exception e) {
-      final String requestInfo = generateRedactedRequestInfo(req);
-      final boolean isMerelyResourceException = (e instanceof ResourceException);
-      final DBObject error = errorToDBObject(e, !isMerelyResourceException);
-      if (isMerelyResourceException) {
-        final ResourceException re = (ResourceException) e;
-        res.setStatus(re.getStatusCode());
-        if (re.isSevere()) {
-          LOG.error(
-              String.format(
-                  "Exception handling request, returning status code %d: %s",
-                  re.getStatusCode(), requestInfo),
-              e);
-        } else if (LOG.isDebugEnabled()) {
-          LOG.debug(
-              String.format(
-                  "Exception handling request, returning status code %d: %s: %s",
-                  re.getStatusCode(), requestInfo, JSON.serialize(error)));
-        }
-      } else {
-        res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        LOG.error("Error handling request: " + requestInfo, e);
-      }
-      res.setContentType("application/json; charset=utf-8");
-      try {
-        res.getWriter().println(JSON.serialize(error));
-      } catch (final IOException ioe) {
-        throw new MlabException(ioe);
-      }
-    }
-  }
-
   private static String generateRedactedRequestInfo(final HttpServletRequest request) {
     // Redact secrets from the following parameters according to the need.
     String queryString = request.getQueryString(); // This is being redacted
@@ -83,7 +41,7 @@ public class ApiServlet extends HttpServlet {
         .append(request.getMethod())
         .append(" ")
         .append(requestURI)
-        .append((queryString == null || queryString.isEmpty()) ? "" : "?" + queryString)
+        .append(queryString == null || queryString.isEmpty() ? "" : "?" + queryString)
         .append(" (_method = ")
         .append(request.getParameter("_method"))
         .append(", servletPath = ")
@@ -112,7 +70,7 @@ public class ApiServlet extends HttpServlet {
     if (wantingDetails) {
       Throwable cause = t;
       while (cause.getCause() != null) cause = cause.getCause();
-      final List<String> stackTrace = new LinkedList<String>();
+      final List<String> stackTrace = new LinkedList<>();
       for (final StackTraceElement element : cause.getStackTrace()) {
         stackTrace.add(element.toString());
       }
@@ -120,5 +78,47 @@ public class ApiServlet extends HttpServlet {
       error.put("stackTrace", stackTrace);
     }
     return error;
+  }
+
+  @Override
+  public void service(final HttpServletRequest req, final HttpServletResponse res) {
+    try {
+      final String path = req.getPathInfo();
+      final Resource resource = new RootResource().resolve(path);
+      if (resource == null) {
+        res.setStatus(HttpServletResponse.SC_NOT_FOUND);
+      } else {
+        resource.service(req, res);
+      }
+    } catch (final Exception e) {
+      final String requestInfo = generateRedactedRequestInfo(req);
+      final boolean isMerelyResourceException = e instanceof ResourceException;
+      final DBObject error = errorToDBObject(e, !isMerelyResourceException);
+      if (isMerelyResourceException) {
+        final ResourceException re = (ResourceException) e;
+        res.setStatus(re.getStatusCode());
+        if (re.isSevere()) {
+          LOG.error(
+              String.format(
+                  "Exception handling request, returning status code %d: %s",
+                  re.getStatusCode(), requestInfo),
+              e);
+        } else if (LOG.isDebugEnabled()) {
+          LOG.debug(
+              String.format(
+                  "Exception handling request, returning status code %d: %s: %s",
+                  re.getStatusCode(), requestInfo, JSON.serialize(error)));
+        }
+      } else {
+        res.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        LOG.error("Error handling request: " + requestInfo, e);
+      }
+      res.setContentType("application/json; charset=utf-8");
+      try {
+        res.getWriter().println(JSON.serialize(error));
+      } catch (final IOException ioe) {
+        throw new MlabException(ioe);
+      }
+    }
   }
 }

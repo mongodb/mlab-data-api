@@ -14,32 +14,32 @@ import com.mlab.ws.ResourceException;
 
 public class DBCollectionsResource extends PortalRESTResource {
 
+  private final String[] METHODS = {HttpMethod.GET.name()};
+  private MongoDatabase database;
+
   public DBCollectionsResource(final MongoDatabase db) {
     super();
     setDatabase(db);
   }
 
-  private String[] methods = {HttpMethod.GET.name()};
-
   public String[] getMethods() {
-    return (methods);
+    return METHODS;
   }
 
   public String getName() {
-    return ("collections");
+    return "collections";
   }
 
-  private MongoDatabase database;
-
   public MongoDatabase getDatabase() {
-    return (database);
+    return database;
   }
 
   public void setDatabase(final MongoDatabase value) {
     database = value;
   }
 
-  public Object handleGet(final Map parameters, final RequestContext context) throws ResourceException {
+  public Object handleGet(final Map parameters, final RequestContext context)
+      throws ResourceException {
     final Collection<String> sorted =
         new TreeSet<>(
             (s, s2) -> {
@@ -72,6 +72,6 @@ public class DBCollectionsResource extends PortalRESTResource {
   public Resource resolveRelative(final Uri uri) {
     final Resource r = new CollectionResource(getDatabase().getCollection(uri.getHead()));
     r.setParent(this);
-    return(r.resolve(uri.getTail()));
+    return r.resolve(uri.getTail());
   }
 }

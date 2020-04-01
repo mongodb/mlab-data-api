@@ -1,5 +1,7 @@
 package com.mlab.ws;
 
+import com.mlab.json.JsonParser;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
@@ -14,42 +16,18 @@ import com.mlab.http.HttpMethod;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class RestResource<T> extends ViewableResource {
+public abstract class RestResource<T> extends Resource {
 
   private static final Logger log = LoggerFactory.getLogger(RestResource.class);
-  protected static ThreadLocal mResultObject = new ThreadLocal();
+  private final JsonParser jsonParser = new JsonParser();
   List<String> methodNames = null;
   private String[] methods = new String[0];
   private String[] supportedMethods = null;
 
-  private boolean mAuditing = false;
-
-  protected abstract String getDefaultViewName();
-
-  protected abstract View getDefaultView();
-
   protected abstract T getObjectFromRequestBody(HttpServletRequest request);
 
-  public View getView() {
-    View result = super.getView();
-    if (result == null) {
-      result = getDefaultView();
-    }
-    return (result);
-  }
-
-  public View getView(String viewName) {
-    View result = super.getView(viewName);
-    if (result == null) {
-      if (viewName.equals(getDefaultViewName())) {
-        result = getDefaultView();
-      }
-    }
-    return (result);
-  }
-
   public String[] getMethods() {
-    return (methods);
+    return methods;
   }
 
   public void setMethods(String[] value) {
@@ -63,48 +41,28 @@ public abstract class RestResource<T> extends ViewableResource {
 
   public final String[] getSupportedMethods() {
     if (supportedMethods == null) {
-      Set<String> ms = new HashSet<String>(Arrays.asList(getMethods()));
+      final Set<String> ms = new HashSet<>(Arrays.asList(getMethods()));
       ms.add(HttpMethod.OPTIONS.name());
-      supportedMethods = ms.toArray(new String[ms.size()]);
+      supportedMethods = ms.toArray(new String[0]);
     }
     return supportedMethods;
   }
 
-  public List<String> getSupportedMethodNames() {
-    if (methodNames == null) {
-      List<String> names = new ArrayList<String>();
-      for (String m : getSupportedMethods()) {
-        names.add(m);
-      }
-      methodNames = names;
-    }
-    return methodNames;
-  }
-
-  public boolean isAuditing() {
-    return mAuditing;
-  }
-
-  public void setAuditing(boolean auditing) {
-    mAuditing = auditing;
-  }
-
-  public boolean supportsMethod(String method) {
-    String[] methods = getSupportedMethods();
-    for (String m : methods) {
+  public boolean supportsMethod(final String method) {
+    final String[] methods = getSupportedMethods();
+    for (final String m : methods) {
       if (m.equals(method)) {
-        return (true);
+        return true;
       }
     }
-    return (false);
+    return false;
   }
 
-  public void service(HttpServletRequest request, HttpServletResponse response) {
-    mResultObject.remove(); // Probably not necessary, but best to be safe!
-    String method = getMethod(request);
+  public void service(final HttpServletRequest request, final HttpServletResponse response) {
+    final String method = getMethod(request);
 
     if (method == null) {
-      throw (new WebServiceException("Unexpected null Http method"));
+      throw new WebServiceException("Unexpected null Http method");
     }
 
     if (!supportsMethod(method) && !method.equals(HttpMethod.OPTIONS.name())) {
@@ -135,118 +93,131 @@ public abstract class RestResource<T> extends ViewableResource {
         break;
       default:
         log.error("Unsupported method: " + method);
-        throw (new ResourceException("Unsupported method"));
+        throw new ResourceException("Unsupported method");
     }
   }
 
-  public void serviceGet(HttpServletRequest request, HttpServletResponse response) {
-    Map parameters = getParameters(request);
-    T result = handleGet(parameters, makeRequestContext(request, response));
+  public void serviceGet(final HttpServletRequest request, final HttpServletResponse response) {
+    final Map parameters = getParameters(request);
+    final T result = handleGet(parameters, makeRequestContext(request, response));
     processResponse(result, request, response);
   }
 
-  public void servicePost(HttpServletRequest request, HttpServletResponse response) {
-    T object = getObjectFromRequestBody(request);
-    T result = handlePost(object, makeRequestContext(request, response));
+  public void servicePost(final HttpServletRequest request, final HttpServletResponse response) {
+    final T object = getObjectFromRequestBody(request);
+    final T result = handlePost(object, makeRequestContext(request, response));
     processResponse(result, request, response);
   }
 
-  public void servicePut(HttpServletRequest request, HttpServletResponse response) {
-    T object = getObjectFromRequestBody(request);
-    T result = handlePut(object, makeRequestContext(request, response));
+  public void servicePut(final HttpServletRequest request, final HttpServletResponse response) {
+    final T object = getObjectFromRequestBody(request);
+    final T result = handlePut(object, makeRequestContext(request, response));
     processResponse(result, request, response);
   }
 
-  public void serviceDelete(HttpServletRequest request, HttpServletResponse response) {
-    T result = handleDelete(makeRequestContext(request, response));
+  public void serviceDelete(final HttpServletRequest request, final HttpServletResponse response) {
+    final T result = handleDelete(makeRequestContext(request, response));
     processResponse(result, request, response);
   }
 
-  public void serviceCreate(HttpServletRequest request, HttpServletResponse response) {
-    T result = handleCreate(makeRequestContext(request, response));
+  public void serviceCreate(final HttpServletRequest request, final HttpServletResponse response) {
+    final T result = handleCreate(makeRequestContext(request, response));
     processResponse(result, request, response);
   }
 
-  public void serviceHead(HttpServletRequest request, HttpServletResponse response) {
+  public void serviceHead(final HttpServletRequest request, final HttpServletResponse response) {
     throw new WebServiceException(HttpServletResponse.SC_NOT_IMPLEMENTED, "Not implemented");
   }
 
-  public void serviceOptions(HttpServletRequest request, HttpServletResponse response) {
-    String[] methods = getSupportedMethods();
+  public void serviceOptions(final HttpServletRequest request, final HttpServletResponse response) {
+    final String[] methods = getSupportedMethods();
     if (methods != null && methods.length > 0) {
-      StringBuilder methodStr = new StringBuilder();
+      final StringBuilder methodStr = new StringBuilder();
       for (int i = 0; i < methods.length - 1; i++) {
         methodStr.append(methods[i]);
         methodStr.append(",");
       }
       methodStr.append(methods[methods.length - 1]);
-      String str = methodStr.toString();
+      final String str = methodStr.toString();
       response.addHeader("Allow", str);
       response.addHeader("Access-Control-Allow-Methods", str);
     }
   }
 
-  protected T handleGet(Map parameters, RequestContext context) {
-    return (null);
+  protected T handleGet(final Map parameters, final RequestContext context) {
+    return null;
   }
 
-  protected T handlePost(T object, RequestContext context) {
-    return (null);
+  protected T handlePost(final T object, final RequestContext context) {
+    return null;
   }
 
-  protected T handlePut(T object, RequestContext context) {
-    return (null);
+  protected T handlePut(final T object, final RequestContext context) {
+    return null;
   }
 
-  protected T handleDelete(RequestContext context) {
-    return (null);
+  protected T handleDelete(final RequestContext context) {
+    return null;
   }
 
-  protected T handleCreate(RequestContext context) {
-    return (null);
+  protected T handleCreate(final RequestContext context) {
+    return null;
   }
 
-  protected T handleHead(RequestContext context) {
-    return (null);
+  protected T handleHead(final RequestContext context) {
+    return null;
   }
 
-  protected T handleOptions(RequestContext context) {
-    return (null);
+  protected T handleOptions(final RequestContext context) {
+    return null;
   }
 
   protected void processResponse(
-      T result, HttpServletRequest request, HttpServletResponse response) {
-    if (isAuditing()) {
-      mResultObject.set(result);
+      final T result, final HttpServletRequest request, final HttpServletResponse response) {
+    response.setContentType("application/json; charset=utf-8");
+    Writer w = null;
+
+    try {
+      w = response.getWriter();
+      jsonParser.serialize(result, w);
+    } catch (final Exception e) {
+      throw new WebServiceException(e);
+    } finally {
+      try {
+        if (w != null) {
+          w.flush();
+        }
+      } catch (final Exception e) {
+        log.warn("Unexpected exception flushing output stream", e);
+      }
     }
-    render(result, request, response);
   }
 
-  private String getMethod(HttpServletRequest request) {
+  private String getMethod(final HttpServletRequest request) {
     String result = request.getMethod();
     if (result != null) {
       result = result.toUpperCase();
     }
-    return (result);
+    return result;
   }
 
-  protected Map getParameters(HttpServletRequest request) {
-    Map result = new HashMap();
+  protected Map getParameters(final HttpServletRequest request) {
+    final Map result = new HashMap();
 
-    Enumeration e = request.getParameterNames();
+    final Enumeration e = request.getParameterNames();
     while (e.hasMoreElements()) {
-      String pname = (String) e.nextElement();
+      final String pname = (String) e.nextElement();
       result.put(pname, request.getParameter(pname));
     }
 
-    return (result);
+    return result;
   }
 
   protected RequestContext makeRequestContext(
-      HttpServletRequest request, HttpServletResponse response) {
-    RequestContext result = new RequestContext();
+      final HttpServletRequest request, final HttpServletResponse response) {
+    final RequestContext result = new RequestContext();
     result.setServletRequest(request);
     result.setServletResponse(response);
-    return (result);
+    return result;
   }
 }

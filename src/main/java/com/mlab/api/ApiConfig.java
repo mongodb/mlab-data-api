@@ -63,7 +63,7 @@ public class ApiConfig {
     return apiKey;
   }
 
-  private static ApiConfig parseConfig(String pConfigString) throws IOException {
+  private static ApiConfig parseConfig(final String pConfigString) throws IOException {
     final ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
     // file?
     try {

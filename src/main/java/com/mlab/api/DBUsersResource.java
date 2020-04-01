@@ -24,7 +24,7 @@ public class DBUsersResource extends PortalRESTResource {
   }
 
   public MongoDatabase getDatabase() {
-    return (database);
+    return database;
   }
 
   public void setDatabase(final MongoDatabase value) {

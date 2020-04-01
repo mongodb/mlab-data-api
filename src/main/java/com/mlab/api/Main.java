@@ -18,7 +18,7 @@ public class Main {
 
   private static Tomcat _tomcat = null;
 
-  public static void main(String[] args) throws Exception {
+  public static void main(final String[] args) throws Exception {
     readEnvToProp(CONFIG_ENV_VAR, ApiConfig.CONFIG_PROPERTY);
     readEnvToProp(API_KEY_ENV_VAR, ApiConfig.API_KEY_PROPERTY);
     System.setProperty(ApiConfig.APP_DIR_PROPERTY, WEB_APP_DIR);

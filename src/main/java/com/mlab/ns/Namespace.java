@@ -2,21 +2,19 @@ package com.mlab.ns;
 
 public interface Namespace {
 
-  public String getName();
+  String getName();
 
-  public void setName(String name);
+  void setName(String name);
 
-  public String getAbsoluteName();
+  String getAbsoluteName();
 
-  public Namespace getParent();
+  Namespace getParent();
 
-  public void setParent(Namespace value);
+  void setParent(Namespace value);
 
-  public Namespace getParent(Class c);
+  Namespace getRoot();
 
-  public Namespace getRoot();
+  Namespace resolve(String name);
 
-  public Namespace resolve(String name);
-
-  public Namespace resolve(Uri name);
+  Namespace resolve(Uri name);
 }
