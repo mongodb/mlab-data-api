@@ -12,7 +12,7 @@ java {
 }
 
 ext {
-    javaMainClass = 'org.olabs.portal.api.Main'
+    javaMainClass = 'com.mlab.api.Main'
 }
 
 application {

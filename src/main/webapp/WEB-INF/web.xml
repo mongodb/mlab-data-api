@@ -12,7 +12,7 @@
 
     <filter>
         <filter-name>ApiKeyFilter</filter-name>
-        <filter-class>org.olabs.portal.api.ApiKeyFilter</filter-class>
+        <filter-class>com.mlab.api.ApiKeyFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>ApiKeyFilter</filter-name>
@@ -21,7 +21,7 @@
 
     <servlet>
         <servlet-name>Status</servlet-name>
-        <servlet-class>org.olabs.portal.api.StatusServlet</servlet-class>
+        <servlet-class>com.mlab.api.StatusServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Status</servlet-name>
@@ -30,7 +30,7 @@
 
     <servlet>
         <servlet-name>Api</servlet-name>
-        <servlet-class>org.olabs.portal.api.ApiServlet</servlet-class>
+        <servlet-class>com.mlab.api.ApiServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>Api</servlet-name>
