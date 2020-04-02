@@ -30,6 +30,7 @@ public abstract class BaseResourceTest {
   public static final String SHARED_CLUSTER_ID = "rs-ds253357";
   public static final String TEST_CLIENT_NAME = "test";
   public static final String PROD_CLIENT_NAME = "production";
+  public static final String TEST_STRING = "string_with_utf8: Iñtërnâtiônàlizætiøn";
   public static final Date TEST_DATE = new Date(1000000000);
   public static final UUID TEST_UUID = UUID.randomUUID();
   public static final Binary TEST_BINARY = new Binary(new byte[] {1, 2, 3, 4});
@@ -86,7 +87,7 @@ public abstract class BaseResourceTest {
     final Map<String, Object> m = new HashMap<>();
     m.put("date", TEST_DATE);
     m.put("int", 100);
-    m.put("string", "string");
+    m.put("string", TEST_STRING);
     m.put("objectid", oid(1000));
     m.put("boolean", false);
     m.put("array", new JSONArray(List.of("a", "b", "c")));
@@ -109,7 +110,7 @@ public abstract class BaseResourceTest {
     // int
     assertEquals(100, o.get("int"));
     // string
-    assertEquals("string", o.get("string"));
+    assertEquals(TEST_STRING, o.get("string"));
     // ObjectId
     assertTrue(((JSONObject) o.get("objectid")).has("$oid"));
     assertEquals(oid(1000).toHexString(), ((JSONObject) o.get("objectid")).get("$oid"));
