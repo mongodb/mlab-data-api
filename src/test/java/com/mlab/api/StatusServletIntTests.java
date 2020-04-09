@@ -9,7 +9,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.junit.Test;
 
-public class StatusServletIntTests extends BaseResourceTest {
+public class StatusServletIntTests extends ParameterizedClientTest {
 
   @Test
   public void testStatus() throws IOException {

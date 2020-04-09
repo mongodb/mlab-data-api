@@ -35,11 +35,7 @@ public class ClusterResource extends PortalRESTResource {
     if (head.equals("databases")) {
       r = new MongoDBConnectionResource(getClusterConnection());
     } else if (head.equals("runCommand")) {
-      if (getAuthDb().equals("admin")) {
-        r = new RunCommandResource(getClusterConnection().getDatabase("admin"));
-      } else {
-        throw new ResourceException(HttpServletResponse.SC_NOT_FOUND);
-      }
+      r = new RunCommandResource(getClusterConnection().getDatabase("admin"));
     }
 
     if (r != null) {
@@ -48,9 +44,5 @@ public class ClusterResource extends PortalRESTResource {
     }
 
     return result;
-  }
-
-  private String getAuthDb() {
-    return getApiConfig().getClusterUri(getName()).getDatabase();
   }
 }

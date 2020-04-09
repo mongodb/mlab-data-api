@@ -11,7 +11,7 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.junit.Test;
 
-public class MongoDBConnectionResourceIntTests extends BaseResourceTest {
+public class MongoDBConnectionResourceIntTests extends ParameterizedClientTest {
 
   private static Map<String, List<String>> TEST_CASES =
       Map.of(

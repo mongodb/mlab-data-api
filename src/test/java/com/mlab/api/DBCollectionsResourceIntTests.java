@@ -9,7 +9,7 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.junit.Test;
 
-public class DBCollectionsResourceIntTests extends BaseResourceTest {
+public class DBCollectionsResourceIntTests extends ParameterizedClientTest {
 
   @Test
   public void testGet_test() throws IOException {

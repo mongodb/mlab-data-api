@@ -1,5 +1,7 @@
 package com.mlab.api;
 
+import com.mlab.json.JsonParser;
+import com.mongodb.DBObject;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -26,6 +28,7 @@ import org.slf4j.LoggerFactory;
 public class MlabDataApiClient {
 
   private static final Logger LOG = LoggerFactory.getLogger(MlabDataApiClient.class);
+  private static final JsonParser JSON_PARSER = new JsonParser();
 
   private final String _name;
   private final String _host;
@@ -65,6 +68,11 @@ public class MlabDataApiClient {
     final HttpPost post = new HttpPost(getPathUrl(pPath));
     post.setEntity(new StringEntity(pData, ContentType.APPLICATION_JSON));
     return doRequestString(post);
+  }
+
+  public JSONObject postJson(final String pPath, final DBObject pData) throws IOException {
+    final String result = post(pPath, JSON_PARSER.serialize(pData));
+    return result == null ? null : new JSONObject(result);
   }
 
   public JSONObject postJson(final String pPath, final String pData) throws IOException {

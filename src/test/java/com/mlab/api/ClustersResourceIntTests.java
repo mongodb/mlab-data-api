@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.junit.Test;
 
-public class ClustersResourceIntTests extends BaseResourceTest {
+public class ClustersResourceIntTests extends ParameterizedClientTest {
 
   @Test
   public void testGet() throws IOException {

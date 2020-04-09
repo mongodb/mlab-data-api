@@ -15,7 +15,7 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Test;
 
-public class DBUsersResourceIntTests extends BaseResourceTest {
+public class DBUsersResourceIntTests extends ParameterizedClientTest {
 
   private static final String TEST_DB = "usersTest";
 

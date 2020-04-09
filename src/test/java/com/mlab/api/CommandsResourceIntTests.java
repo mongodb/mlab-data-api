@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.json.JSONObject;
 import org.junit.Test;
 
-public class CommandsResourceIntTests extends BaseResourceTest {
+public class CommandsResourceIntTests extends ParameterizedClientTest {
 
   @Test
   public void testGet() throws IOException {

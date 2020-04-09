@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.List;
 import org.junit.Test;
 
-public class DatabaseResourceIntTests extends BaseResourceTest {
+public class DatabaseResourceIntTests extends ParameterizedClientTest {
 
   @Test
   public void testGet() throws IOException {

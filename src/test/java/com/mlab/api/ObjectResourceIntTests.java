@@ -22,7 +22,7 @@ import com.mlab.ws.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class ObjectResourceIntTests extends BaseResourceTest {
+public class ObjectResourceIntTests extends ParameterizedClientTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(CollectionResourceIntTests.class);
   private static final String TEST_DB = "test";

@@ -31,13 +31,12 @@ import com.mlab.ws.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class CollectionResourceIntTests extends BaseResourceTest {
+public class CollectionResourceIntTests extends ParameterizedClientTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(CollectionResourceIntTests.class);
   private static final String TEST_DB = "test";
   private static final String TEST_GET_COLLECTION = new ObjectId().toString();
   private static final String TEST_POST_COLLECTION = new ObjectId().toString();
-  private static final JsonParser JSON_PARSER = new JsonParser();
 
   @BeforeClass
   public static void setUpClass() {
