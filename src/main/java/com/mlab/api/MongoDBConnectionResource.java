@@ -2,6 +2,7 @@ package com.mlab.api;
 
 import com.mongodb.BasicDBList;
 import com.mongodb.MongoClient;
+import com.mongodb.MongoCommandException;
 import com.mongodb.client.MongoDatabase;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -16,8 +17,12 @@ import com.mlab.ns.Uri;
 import com.mlab.ws.RequestContext;
 import com.mlab.ws.Resource;
 import com.mlab.ws.WebServiceException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MongoDBConnectionResource extends PortalRESTResource {
+
+  private static final Logger LOG = LoggerFactory.getLogger(MongoDBConnectionResource.class);
 
   private final MongoClient mongo;
 
@@ -55,13 +60,15 @@ public class MongoDBConnectionResource extends PortalRESTResource {
   }
 
   private Collection<String> getDbNames() {
-    final String authDb = getApiConfig().getClusterUri(getParent().getName()).getDatabase();
-    if (authDb == null) {
-      return Collections.emptyList();
+    try {
+      return getMongo().listDatabaseNames().into(new ArrayList<>());
+    } catch (final MongoCommandException e) {
+      if (e.getErrorCode() == 13) {
+        final String authDb = getApiConfig().getClusterUri(getParent().getName()).getDatabase();
+        return authDb == null ? Collections.emptyList() : List.of(authDb);
+      }
+      throw e;
     }
-    return authDb.equals(MongoUtils.ADMIN_DB_NAME)
-        ? getMongo().listDatabaseNames().into(new ArrayList<>())
-        : List.of(authDb);
   }
 
   public Resource resolveRelative(final Uri uri) {

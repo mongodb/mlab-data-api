@@ -31,7 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @RunWith(Parameterized.class)
-public class RunCommandResourceIntTests extends BaseResourceTest {
+public class RunCommandResourceIntTests extends ParameterizedClientTest {
 
   private static final Logger LOG = LoggerFactory.getLogger(RunCommandResource.class);
   private static final String TEST_DB = "test";
@@ -49,9 +49,12 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
           .toString();
   private static final String SANDBOX_URL =
       ApiPathBuilder.start().db("aws-us-east-1-sandbox").runCommand().toString();
+  private static final String ATLAS_CLUSTER_URL =
+      ApiPathBuilder.start().cluster(ATLAS_CLUSTER_ID).runCommand().toString();
 
   private static final List<String> ALL_URLS =
-      List.of(DEDICATED_CLUSTER_URL, DEDICATED_DB_URL, SHARED_DB_URL, SANDBOX_URL);
+      List.of(
+          DEDICATED_CLUSTER_URL, DEDICATED_DB_URL, SHARED_DB_URL, SANDBOX_URL, ATLAS_CLUSTER_URL);
   private static final Consumer<JSONObject> ASSERT_SUCCESS =
       result -> {
         assertNotNull(result);
@@ -85,20 +88,27 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
                 data.add(new Object[] {getTestClient(), url, cmd});
                 data.add(new Object[] {getProductionClient(), url, cmd});
               });
-          data.add(new Object[]{getTestClient(), url, INVALID_COMMAND});
-          data.add(new Object[]{getProductionClient(), url, INVALID_COMMAND});
+          data.add(new Object[] {getTestClient(), url, INVALID_COMMAND});
+          data.add(new Object[] {getProductionClient(), url, INVALID_COMMAND});
         });
     return data;
   }
 
   @BeforeClass
   public static void beforeClass() {
-    // seed test collection
-    final MongoCollection c =
+    seedCollection(
         ApiConfig.getInstance()
             .getClusterConnection(DEDICATED_CLUSTER_ID)
             .getDatabase(TEST_DB)
-            .getCollection(TEST_COLLECTION);
+            .getCollection(TEST_COLLECTION));
+    seedCollection(
+        ApiConfig.getInstance()
+            .getClusterConnection(ATLAS_CLUSTER_ID)
+            .getDatabase(TEST_DB)
+            .getCollection(TEST_COLLECTION));
+  }
+
+  private static void seedCollection(final MongoCollection c) {
     // add geospatial index
     c.createIndex(new BasicDBObject("loc", "2dsphere"));
     final List<Document> docs = new ArrayList<>();
@@ -119,6 +129,11 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
           .getDatabase(TEST_DB)
           .getCollection(TEST_COLLECTION)
           .drop();
+      ApiConfig.getInstance()
+          .getClusterConnection(ATLAS_CLUSTER_ID)
+          .getDatabase(TEST_DB)
+          .getCollection(TEST_COLLECTION)
+          .drop();
     } catch (final Exception e) {
       LOG.error("Unable to clean up test collections", e);
     }
@@ -133,6 +148,10 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
     // don't test admin commands against database endpoints
     if (RunCommandResource.SUPPORTED_ADMIN_COMMANDS.contains(command)) {
       assumeFalse(url.contains("databases"));
+    }
+    // only test Atlas URL on test client
+    if (url.contains(ATLAS_CLUSTER_ID)) {
+      assumeTrue(client.getName().equals(TEST_CLIENT_NAME));
     }
 
     final BasicDBObject commandObj = getCommandObject();
@@ -211,7 +230,7 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
       case "distinct":
         return result -> {
           ASSERT_SUCCESS.accept(result);
-          if(url.equals(DEDICATED_DB_URL)) {
+          if (url.equals(DEDICATED_DB_URL)) {
             assertEquals(
                 List.of("0", "1", "2", "3", "4", "5", "6", "7", "8", "9"),
                 result.getJSONArray("values").toList());
@@ -237,7 +256,7 @@ public class RunCommandResourceIntTests extends BaseResourceTest {
   }
 
   private void handleError(final ResourceException e) {
-    if(command.equals(INVALID_COMMAND)) {
+    if (command.equals(INVALID_COMMAND)) {
       assertEquals(HttpServletResponse.SC_BAD_REQUEST, e.getStatusCode());
       assertTrue(e.getMessage().contains("invalid or unsupported"));
     } else {

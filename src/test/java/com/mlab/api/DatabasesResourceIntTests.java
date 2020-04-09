@@ -7,7 +7,7 @@ import java.io.IOException;
 import org.json.JSONArray;
 import org.junit.Test;
 
-public class DatabasesResourceIntTests extends BaseResourceTest {
+public class DatabasesResourceIntTests extends ParameterizedClientTest {
   @Test
   public void testGet() throws IOException {
     final JSONArray databases = client.getJsonArray("databases");
