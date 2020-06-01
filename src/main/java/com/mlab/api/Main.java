@@ -13,6 +13,7 @@ import com.mlab.ws.ResourceException;
 public class Main {
   private static final String CONFIG_ENV_VAR = "MLAB_DATA_API_CONFIG";
   private static final String API_KEY_ENV_VAR = "MLAB_DATA_API_KEY";
+  private static final String PORT_ENV_VAR = "PORT";
   private static final String WEB_APP_DIR = "www";
   private static final String WEB_APP_PATH = "";
 
@@ -40,8 +41,17 @@ public class Main {
       return;
     }
     _tomcat = new Tomcat();
+    int port = ApiConfig.getInstance().getPort();
+    if(port <= 0) {
+      final String portEnv = System.getenv(PORT_ENV_VAR);
+      if(portEnv == null || portEnv.isEmpty()) {
+        System.out.println("PORT is required");
+        System.exit(1);
+      }
+      port = Integer.valueOf(portEnv);
+    }
     try {
-      _tomcat.setPort(ApiConfig.getInstance().getPort());
+      _tomcat.setPort(port);
     } catch (final ResourceException e) {
       System.out.println(String.format("Error getting config: %s", e.getMessage()));
       System.exit(1);
@@ -57,7 +67,7 @@ public class Main {
               resources, "/WEB-INF/classes", additionWebInfClasses.getAbsolutePath(), "/"));
     }
     ctx.setResources(resources);
-    System.out.println("Starting mLab Data API...");
+    System.out.println("Starting mLab Data API on port "+port+"...");
     _tomcat.start();
   }
 
