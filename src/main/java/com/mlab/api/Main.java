@@ -56,6 +56,7 @@ public class Main {
       System.out.println(String.format("Error getting config: %s", e.getMessage()));
       System.exit(1);
     }
+    _tomcat.getConnector().setAttribute("relaxedQueryChars", "\"<>[]{}");
     final String webAppDir = System.getProperty(ApiConfig.APP_DIR_PROPERTY);
     final StandardContext ctx =
         (StandardContext) _tomcat.addWebapp(WEB_APP_PATH, new File(webAppDir).getAbsolutePath());
