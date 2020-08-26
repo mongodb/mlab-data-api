@@ -1,5 +1,6 @@
 package com.mlab.api;
 
+import static com.mlab.mongodb.MongoUtils.toISODateString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -8,8 +9,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
-import static com.mlab.mongodb.MongoUtils.toISODateString;
 
+import com.mlab.mongodb.MongoUtils;
+import com.mlab.ws.ResourceException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.client.MongoCollection;
@@ -25,9 +27,6 @@ import org.json.JSONObject;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import com.mlab.json.JsonParser;
-import com.mlab.mongodb.MongoUtils;
-import com.mlab.ws.ResourceException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -183,6 +182,14 @@ public class CollectionResourceIntTests extends ParameterizedClientTest {
                 .query("q", new BasicDBObject("variable", "1").toJson())
                 .toString());
     assertEquals("1", filteredCount);
+    final String countIgnoresSkipLimit =
+        client.get(
+            getCollectionUrl(TEST_GET_COLLECTION)
+                .query("c", "true")
+                .query("l", 2)
+                .query("sk", 1)
+                .toString());
+    assertEquals("3", countIgnoresSkipLimit);
   }
 
   @Test

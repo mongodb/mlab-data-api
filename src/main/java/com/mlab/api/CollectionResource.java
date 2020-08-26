@@ -2,13 +2,19 @@ package com.mlab.api;
 
 import static com.mongodb.client.model.Filters.eq;
 
+import com.mlab.http.HttpMethod;
+import com.mlab.mongodb.MongoUtils;
+import com.mlab.mongodb.SecurityUtils;
+import com.mlab.ns.Uri;
+import com.mlab.ws.RequestContext;
+import com.mlab.ws.Resource;
+import com.mlab.ws.ResourceException;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcernException;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.model.CountOptions;
 import com.mongodb.client.model.UpdateOptions;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
@@ -23,13 +29,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.bson.BSONObject;
 import org.bson.Document;
 import org.bson.types.ObjectId;
-import com.mlab.http.HttpMethod;
-import com.mlab.mongodb.MongoUtils;
-import com.mlab.mongodb.SecurityUtils;
-import com.mlab.ns.Uri;
-import com.mlab.ws.RequestContext;
-import com.mlab.ws.Resource;
-import com.mlab.ws.ResourceException;
 
 public class CollectionResource extends PortalRESTResource {
 
@@ -434,7 +433,7 @@ public class CollectionResource extends PortalRESTResource {
         }
         return result.isEmpty() ? null : result.iterator().next();
       } else if (count) {
-        return collection.countDocuments(query, new CountOptions().skip(skip).limit(limit));
+        return collection.countDocuments(query);
       } else {
         return collection
             .find(query)
