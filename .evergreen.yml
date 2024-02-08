@@ -15,33 +15,16 @@ functions:
         args:
           - install
           - test
-  "publish docker image":
-    - command: shell.exec
-      params:
-        working_dir: mlab-data-api/src
-        shell: bash
-        script: |
-          if [ "${is_patch}" = "true" ]; then
-            echo "Skipping docker image publication for patch build"
-            exit 0
-          else
-            echo "Publishing docker image to ${DOCKER_REPO}"
-          fi
-          docker login --username ${DOCKER_REPO_USER} --password ${DOCKER_REPO_PASSWORD} ${DOCKER_REPO}
-          docker build -t mlab-data-api .
-          docker tag mlab-data-api:latest ${DOCKER_IMAGE}:latest
-          docker push ${DOCKER_IMAGE}:latest
 
 tasks:
 - name: test
   commands:
     - func: fetch source
     - func: run tests
-    - func: publish docker image
 
 buildvariants:
 - name: test
-  display_name: test and publish
+  display_name: test
   run_on:
     - ubuntu1804
   tasks:
